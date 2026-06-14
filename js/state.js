@@ -1,3 +1,4 @@
+let currentUid = null; // set after Firebase auth; keys all localStorage data
 let subs = [];
 let editingId = null;
 let selectedEmoji = '📦';

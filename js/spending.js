@@ -17,19 +17,21 @@ let spendViewMonth     = null;
 let spendCurrentTab    = 'tx';
 
 function loadSpendings() {
-    try { return JSON.parse(localStorage.getItem('sprout_spendings') || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(getKey('spendings')) || '[]'); } catch { return []; }
 }
 
 function saveSpendings() {
-    localStorage.setItem('sprout_spendings', JSON.stringify(spendings));
+    localStorage.setItem(getKey('spendings'), JSON.stringify(spendings));
+    if (typeof dbSyncSpendings === 'function') dbSyncSpendings(spendings);
 }
 
 function getBudget() {
-    try { return JSON.parse(localStorage.getItem('sprout_budget') || '{"monthly":0}'); } catch { return { monthly: 0 }; }
+    try { return JSON.parse(localStorage.getItem(getKey('budget')) || '{"monthly":0}'); } catch { return { monthly: 0 }; }
 }
 
 function setBudget(monthly) {
-    localStorage.setItem('sprout_budget', JSON.stringify({ monthly }));
+    localStorage.setItem(getKey('budget'), JSON.stringify({ monthly }));
+    if (typeof dbSyncSettings === 'function') dbSyncSettings({ monthly, catBudgets: getCatBudgets() });
 }
 
 function getMonthSpendings(year, month) {
@@ -357,13 +359,14 @@ function showSpendTab(tab) {
 
 // ── Per-category budgets ──────────────────────────────────────────────
 function getCatBudgets() {
-    try { return JSON.parse(localStorage.getItem('sprout_cat_budgets') || '{}'); } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem(getKey('cat_budgets')) || '{}'); } catch { return {}; }
 }
 
 function setCatBudget(cat, amount) {
     const budgets = getCatBudgets();
     if (amount > 0) budgets[cat] = amount; else delete budgets[cat];
-    localStorage.setItem('sprout_cat_budgets', JSON.stringify(budgets));
+    localStorage.setItem(getKey('cat_budgets'), JSON.stringify(budgets));
+    if (typeof dbSyncSettings === 'function') dbSyncSettings({ monthly: getBudget().monthly, catBudgets: budgets });
 }
 
 function promptCatBudget(cat) {

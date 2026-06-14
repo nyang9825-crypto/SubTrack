@@ -1,16 +1,19 @@
-const STORAGE_KEY     = 'sprout_data';
-const STORAGE_KEY_OLD = 'st_subs_demo';
+// Storage key helper — all data is namespaced by user UID so
+// each account sees only its own data on this device.
+function getKey(base) {
+    return currentUid ? `sprout_${currentUid}_${base}` : `sprout_${base}`;
+}
 
 function persistSubs() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(subs));
+    localStorage.setItem(getKey('data'), JSON.stringify(subs));
+    if (typeof dbSyncSubs === 'function') dbSyncSubs(subs);
 }
 
 function loadSubs() {
-    // Migrate data from old SubTrack key if present
-    const legacy = localStorage.getItem(STORAGE_KEY_OLD);
-    if (legacy) {
-        localStorage.setItem(STORAGE_KEY, legacy);
-        localStorage.removeItem(STORAGE_KEY_OLD);
+    const legacy = localStorage.getItem('st_subs_demo');
+    if (legacy && !currentUid) {
+        localStorage.setItem(getKey('data'), legacy);
+        localStorage.removeItem('st_subs_demo');
     }
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return JSON.parse(localStorage.getItem(getKey('data')) || '[]');
 }

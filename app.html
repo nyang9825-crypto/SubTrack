@@ -10,9 +10,28 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Firebase SDK (must load before app scripts) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <!-- Gmail OAuth -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
+<!-- Loading screen shown until Firebase auth resolves -->
+<div id="appLoader" style="position:fixed;inset:0;background:#f0fdf4;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
+    <div style="width:52px;height:52px;background:linear-gradient(145deg,#22c55e,#15803d);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(22,163,74,0.4)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+            <path d="M 2.5 12 C 6 1 18 1 22 9 L 20.5 10.5 C 17 3.5 7 3.5 4 13 Z"/>
+            <path d="M 6.5 14 C 8.3 14.8 8.3 20.2 6.5 21 C 4.7 20.2 4.7 14.8 6.5 14 Z"/>
+            <path d="M 12 11.5 C 14.5 12.5 14.5 20 12 21 C 9.5 20 9.5 12.5 12 11.5 Z"/>
+            <path d="M 17.5 9 C 20.7 10.2 20.7 19.8 17.5 21 C 14.3 19.8 14.3 10.2 17.5 9 Z"/>
+        </svg>
+    </div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#166534">Loading Sprout…</div>
+</div>
 
 <div id="app">
 
@@ -640,6 +659,7 @@
 <script src="js/modal.js"></script>
 <script src="js/subscriptions.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/db.js"></script>
 <script src="js/spending.js"></script>
 <script src="js/home.js"></script>
 <script src="js/gmail.js"></script>
