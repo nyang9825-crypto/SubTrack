@@ -2,13 +2,17 @@ function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`page-${id}`).classList.add('active');
 
-    const pages = ['dashboard', 'subscriptions', 'analytics', 'upcoming'];
-    const idx = pages.indexOf(id);
+    document.querySelectorAll('.nav-item').forEach(n => {
+        const attr = n.getAttribute('onclick') || '';
+        n.classList.toggle('active', attr.includes(`'${id}'`));
+    });
+    document.querySelectorAll('.mobile-nav-item').forEach(n => {
+        const attr = n.getAttribute('onclick') || '';
+        n.classList.toggle('active', attr.includes(`'${id}'`));
+    });
 
-    document.querySelectorAll('.nav-item').forEach((n, i) => n.classList.toggle('active', i === idx));
-    document.querySelectorAll('.mobile-nav-item').forEach((n, i) => n.classList.toggle('active', i === idx));
-
-    renderAll();
+    if (id === 'spending') { renderBudgetWidget(); renderSpendingPage(); }
+    else renderAll();
 }
 
 function setGreeting() {

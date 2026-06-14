@@ -43,6 +43,9 @@
         <button class="nav-item" onclick="showPage('upcoming')">
             <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span> Upcoming Renewals
         </button>
+        <button class="nav-item" onclick="showPage('spending')">
+            <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span> Spending & Budget
+        </button>
 
         <div class="sidebar-bottom">
             <div class="user-badge">
@@ -135,6 +138,22 @@
                 </div>
             </div>
 
+            <!-- Budget / Spending Widget -->
+            <div class="section-card" style="margin-bottom:20px">
+                <div class="section-head">
+                    <div>
+                        <h3>Budget Overview</h3>
+                        <p style="font-size:12px;color:var(--muted);margin-top:3px">Subscriptions + daily spending vs. your monthly budget.</p>
+                    </div>
+                    <button onclick="openSpendModal()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--primary);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Expense
+                    </button>
+                </div>
+                <div style="padding:20px 20px 22px">
+                    <div id="budgetWidget"></div>
+                </div>
+            </div>
+
             <div class="section-card">
                 <div class="section-head">
                     <h3>Upcoming Renewals</h3>
@@ -222,6 +241,27 @@
             </div>
         </div>
 
+        <!-- Spending & Budget -->
+        <div id="page-spending" class="page">
+            <div class="page-header">
+                <div>
+                    <h2>Spending & Budget</h2>
+                    <p>Track daily expenses alongside your subscriptions.</p>
+                </div>
+                <button onclick="openSpendModal()" class="btn-add">+ Add Expense</button>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+                <button onclick="prevSpendMonth()" class="month-nav-btn">&#8249;</button>
+                <span id="spendMonthLabel" style="font-size:16px;font-weight:700;color:var(--text);min-width:140px;text-align:center">June 2026</span>
+                <button onclick="nextSpendMonth()" class="month-nav-btn">&#8250;</button>
+            </div>
+
+            <div id="spendSummary"></div>
+            <div id="spendCatBreakdown"></div>
+            <div id="spendList"></div>
+        </div>
+
         <!-- Upcoming Renewals -->
         <div id="page-upcoming" class="page">
             <div class="page-header">
@@ -260,6 +300,9 @@
     </button>
     <button class="mobile-nav-item" onclick="showPage('upcoming')">
         <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span>Upcoming</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPage('spending')">
+        <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span>Budget</span>
     </button>
 </nav>
 
@@ -372,6 +415,100 @@
     </div>
 </div>
 
+<!-- Add Expense Modal -->
+<div id="spendModalBackdrop" class="modal-backdrop hidden" onclick="closeSpendModalBackdrop(event)">
+    <div class="modal" style="max-width:480px">
+        <div class="modal-head">
+            <h3>Add Expense</h3>
+            <button class="close-btn" onclick="closeSpendModal()">✕</button>
+        </div>
+
+        <!-- Big amount input -->
+        <div style="padding:20px 24px 0">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Amount</label>
+            <div style="position:relative;margin-top:6px">
+                <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:22px;color:var(--muted);font-weight:700">$</span>
+                <input type="number" id="spendAmount" placeholder="0.00" step="0.01" min="0"
+                    style="width:100%;padding:14px 16px 14px 38px;font-size:28px;font-weight:800;color:var(--text);border:2px solid var(--border);border-radius:12px;outline:none;font-family:inherit"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+            </div>
+        </div>
+
+        <!-- Receipt upload -->
+        <div style="padding:16px 24px 0">
+            <div id="spendReceiptPreview" style="display:none;margin-bottom:10px;border-radius:10px;overflow:hidden;max-height:180px">
+                <img id="spendReceiptImg" style="width:100%;object-fit:cover;display:block" />
+            </div>
+            <label for="spendReceiptFile" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px dashed var(--border);border-radius:10px;cursor:pointer;font-size:13px;color:var(--muted);font-weight:600;transition:all 0.15s"
+                onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                📷 Upload or snap a receipt photo (optional)
+                <input type="file" id="spendReceiptFile" accept="image/*" capture="environment" onchange="onReceiptFileChange(event)" style="display:none" />
+            </label>
+        </div>
+
+        <!-- Description -->
+        <div style="padding:14px 24px 0">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Description</label>
+            <input type="text" id="spendName" placeholder="e.g. Dinner at Nobu, Groceries, Uber…"
+                style="width:100%;margin-top:6px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none"
+                onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+
+        <!-- Category -->
+        <div style="padding:14px 24px 0">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Category</label>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
+                <button class="spend-cat-btn active" data-cat="Food & Dining"    onclick="selectSpendCat('Food & Dining')">🍽️<br><span>Food</span></button>
+                <button class="spend-cat-btn"         data-cat="Shopping"        onclick="selectSpendCat('Shopping')">🛍️<br><span>Shopping</span></button>
+                <button class="spend-cat-btn"         data-cat="Transport"       onclick="selectSpendCat('Transport')">🚗<br><span>Transport</span></button>
+                <button class="spend-cat-btn"         data-cat="Entertainment"   onclick="selectSpendCat('Entertainment')">🎭<br><span>Fun</span></button>
+                <button class="spend-cat-btn"         data-cat="Health & Fitness" onclick="selectSpendCat('Health & Fitness')">🏥<br><span>Health</span></button>
+                <button class="spend-cat-btn"         data-cat="Travel"          onclick="selectSpendCat('Travel')">✈️<br><span>Travel</span></button>
+                <button class="spend-cat-btn"         data-cat="Utilities"       onclick="selectSpendCat('Utilities')">💡<br><span>Bills</span></button>
+                <button class="spend-cat-btn"         data-cat="Other"           onclick="selectSpendCat('Other')">📦<br><span>Other</span></button>
+            </div>
+        </div>
+
+        <!-- Date + Notes -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 24px 20px">
+            <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Date</label>
+                <input type="date" id="spendDate" style="width:100%;margin-top:6px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Notes (optional)</label>
+                <input type="text" id="spendNotes" placeholder="e.g. with family"
+                    style="width:100%;margin-top:6px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+            </div>
+        </div>
+
+        <div class="modal-actions" style="display:flex!important">
+            <button class="btn-cancel" onclick="closeSpendModal()">Cancel</button>
+            <button class="btn-save" onclick="saveSpend()">Save Expense</button>
+        </div>
+    </div>
+</div>
+
+<!-- Detected Spending (Gmail receipts) Modal -->
+<div id="detectedSpendBackdrop" class="modal-backdrop hidden" onclick="if(event.target===this)closeDetectedSpend()">
+    <div class="modal" style="max-width:600px;max-height:80vh;display:flex;flex-direction:column">
+        <div class="modal-head">
+            <h3 id="detectedSpendTitle">Transactions found in Gmail</h3>
+            <button class="close-btn" onclick="closeDetectedSpend()">✕</button>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Review detected transactions. Uncheck any you don't want to import. Adjust amounts or categories as needed.</p>
+        <div id="detectedSpendList" style="flex:1;overflow-y:auto;border:1px solid var(--border);border-radius:10px;margin-bottom:16px"></div>
+        <div style="display:flex;gap:10px">
+            <button class="btn-cancel" onclick="closeDetectedSpend()">Cancel</button>
+            <button class="btn-save" onclick="importDetectedSpend()">Add to Spending Log</button>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts — loaded in dependency order -->
 <script src="js/icons.js"></script>
 <script src="js/constants.js"></script>
@@ -383,6 +520,7 @@
 <script src="js/render.js"></script>
 <script src="js/modal.js"></script>
 <script src="js/subscriptions.js"></script>
+<script src="js/spending.js"></script>
 <script src="js/gmail.js"></script>
 <script src="js/csv.js"></script>
 <script src="js/main.js"></script>

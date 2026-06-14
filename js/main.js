@@ -1,6 +1,8 @@
 window.addEventListener('load', () => {
-    subs = loadSubs();
+    subs      = loadSubs();
+    spendings = loadSpendings();
     setGreeting();
     initGmailUI();
     renderAll();
+    renderBudgetWidget();
 });

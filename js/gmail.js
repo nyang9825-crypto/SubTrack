@@ -57,6 +57,26 @@ function setScanStatus(msg, pct) {
     document.getElementById('scanProgress').style.width    = pct + '%';
 }
 
+function extractReceiptAmount(snippet) {
+    const patterns = [
+        /order total[:\s]+\$?\s*([\d,]+\.?\d{0,2})/i,
+        /total[:\s]+\$?\s*([\d,]+\.?\d{0,2})/i,
+        /amount charged[:\s]+\$?\s*([\d,]+\.?\d{0,2})/i,
+        /amount[:\s]+\$?\s*([\d,]+\.?\d{0,2})/i,
+        /charged[:\s]+\$?\s*([\d,]+\.?\d{0,2})/i,
+        /payment[:\s]+\$?\s*([\d,]+\.?\d{0,2})/i,
+        /\$\s*([\d,]+\.\d{2})(?!\d)/,
+    ];
+    for (const p of patterns) {
+        const m = snippet.match(p);
+        if (m) {
+            const n = parseFloat(m[1].replace(/,/g, ''));
+            if (n >= 1 && n < 50000) return n;
+        }
+    }
+    return null;
+}
+
 async function scanGmail() {
     try {
         setScanStatus('Searching for billing emails…', 25);
@@ -72,6 +92,7 @@ async function scanGmail() {
         setScanStatus(`Found ${messages.length} billing emails — analyzing…`, 50);
 
         const found     = new Map();
+        const receipts  = new Map();
         const batchSize = 20;
 
         for (let i = 0; i < Math.min(messages.length, 80); i += batchSize) {
@@ -79,15 +100,27 @@ async function scanGmail() {
             await Promise.all(batch.map(async (m) => {
                 try {
                     const msgRes = await fetch(
-                        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject`,
+                        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=minimal`,
                         { headers: { Authorization: `Bearer ${gmailToken}` } }
                     );
                     const msg     = await msgRes.json();
                     const headers = msg.payload?.headers || [];
                     const from    = headers.find(h => h.name === 'From')?.value || '';
+                    const subject = headers.find(h => h.name === 'Subject')?.value || '';
+                    const snippet = msg.snippet || '';
                     const domain  = gmailDomain(from);
+
                     if (domain && KNOWN_SENDERS[domain] && !found.has(domain)) {
                         found.set(domain, { ...KNOWN_SENDERS[domain], domain });
+                    } else {
+                        const amount = extractReceiptAmount(snippet);
+                        if (amount && domain) {
+                            const key = `${domain}_${Math.round(amount * 100)}`;
+                            if (!receipts.has(key)) {
+                                const name = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
+                                receipts.set(key, { name, amount, subject, domain, date: new Date().toISOString().split('T')[0] });
+                            }
+                        }
                     }
                 } catch {}
             }));
@@ -98,6 +131,11 @@ async function scanGmail() {
         }
 
         setScanStatus('Done!', 100);
+
+        const receiptList = Array.from(receipts.values());
+        if (receiptList.length > 0) {
+            showDetectedSpending(receiptList);
+        }
 
         const results = Array.from(found.values()).filter(r => !subs.some(s => s.name === r.name));
 
@@ -164,6 +202,54 @@ function showDetectedModal(results, subtitleText, source) {
 
 function closeDetectedModal() {
     document.getElementById('detectedBackdrop').classList.add('hidden');
+}
+
+function showDetectedSpending(items) {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('detectedSpendTitle').textContent = `Found ${items.length} transaction${items.length !== 1 ? 's' : ''} in Gmail`;
+    document.getElementById('detectedSpendList').innerHTML = items.map((r, i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-soft)">
+            <input type="checkbox" id="ds_${i}" checked style="width:16px;height:16px;cursor:pointer;accent-color:var(--primary)" />
+            <div style="flex:1;min-width:0">
+                <div style="font-size:14px;font-weight:600;color:var(--text)">${escHtml(r.name)}</div>
+                <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(r.subject)}</div>
+            </div>
+            <input type="number" id="ds_amt_${i}" value="${r.amount.toFixed(2)}" step="0.01" min="0"
+                style="width:80px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;text-align:right;font-weight:600" />
+            <select id="ds_cat_${i}" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px">
+                ${SPEND_CATS.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('')}
+            </select>
+            <input type="date" id="ds_date_${i}" value="${today}"
+                style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px" />
+        </div>
+    `).join('');
+    window._detectedSpendItems = items;
+    document.getElementById('detectedSpendBackdrop').classList.remove('hidden');
+}
+
+function closeDetectedSpend() {
+    document.getElementById('detectedSpendBackdrop').classList.add('hidden');
+}
+
+function importDetectedSpend() {
+    const items = window._detectedSpendItems || [];
+    let count = 0;
+    items.forEach((r, i) => {
+        if (!document.getElementById(`ds_${i}`)?.checked) return;
+        const amount = parseFloat(document.getElementById(`ds_amt_${i}`).value) || r.amount;
+        const cat    = document.getElementById(`ds_cat_${i}`).value;
+        const date   = document.getElementById(`ds_date_${i}`).value;
+        spendings.push({
+            id: Date.now() + i,
+            name: r.name, amount, category: cat, date,
+            notes: `From: ${r.subject}`, source: 'gmail', receiptThumb: null,
+        });
+        count++;
+    });
+    saveSpendings();
+    renderBudgetWidget();
+    closeDetectedSpend();
+    toast(`${count} transaction${count !== 1 ? 's' : ''} added to Spending`);
 }
 
 function closeDetectedBackdrop(e) {

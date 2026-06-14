@@ -3,6 +3,7 @@ function renderAll() {
     renderSubscriptions();
     renderAnalytics();
     renderUpcoming();
+    renderBudgetWidget();
 }
 
 function renderDashboard() {
