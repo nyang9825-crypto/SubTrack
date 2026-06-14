@@ -15,12 +15,13 @@
 // ─────────────────────────────────────────────────────────
 
 const FIREBASE_CONFIG = {
-    apiKey:            "",
-    authDomain:        "",
-    projectId:         "",
-    storageBucket:     "",
-    messagingSenderId: "",
-    appId:             ""
+    apiKey:            "AIzaSyA4DRE2Tz-FL7QXifU5Cwl5lC4STXCsVCM",
+    authDomain:        "sprout-96f41.firebaseapp.com",
+    projectId:         "sprout-96f41",
+    storageBucket:     "sprout-96f41.firebasestorage.app",
+    messagingSenderId: "918325505701",
+    appId:             "1:918325505701:web:5ac42e8463df2996eee74c",
+    measurementId:     "G-PSP5VDXQJ1"
 };
 
 // Automatically true once you fill in apiKey above
