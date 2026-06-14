@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprout — Shared Trip</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="theme-color" content="#052e16">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',-apple-system,sans-serif; background:#f0fdf4; min-height:100dvh; padding:0 0 40px; }
+        .topbar { background:linear-gradient(135deg,#052e16,#14532d); color:white; padding:16px 20px; display:flex; align-items:center; gap:12px; }
+        .logo { width:36px; height:36px; background:rgba(255,255,255,0.15); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+        .topbar-title { font-size:16px; font-weight:800; }
+        .topbar-sub { font-size:12px; opacity:0.7; margin-top:2px; }
+        .container { max-width:520px; margin:0 auto; padding:20px 16px; }
+        .card { background:white; border-radius:18px; border:1px solid #bbf7d0; overflow:hidden; margin-bottom:16px; }
+        .card-header { padding:18px 20px; border-bottom:1px solid #f0fdf4; }
+        .card-title { font-size:14px; font-weight:700; color:#052e16; }
+        .hero { background:linear-gradient(135deg,#052e16,#14532d); color:white; border-radius:18px; padding:22px; margin-bottom:16px; }
+        .hero-emoji { font-size:40px; margin-bottom:8px; }
+        .hero-name { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+        .hero-date { font-size:13px; opacity:0.7; margin-top:4px; }
+        .hero-total { font-size:36px; font-weight:800; letter-spacing:-1.5px; margin-top:14px; line-height:1; }
+        .hero-label { font-size:11px; opacity:0.65; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+        .pill { display:inline-flex; padding:4px 10px; background:rgba(255,255,255,0.15); border-radius:99px; font-size:12px; font-weight:600; margin:3px 3px 0 0; }
+        .row { display:flex; align-items:center; gap:12px; padding:13px 20px; border-bottom:1px solid #f0fdf4; }
+        .row:last-child { border-bottom:none; }
+        .avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#22c55e,#15803d); display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:700; flex-shrink:0; }
+        .emoji-icon { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+        .label { font-size:14px; font-weight:600; color:#052e16; }
+        .sub { font-size:11px; color:#6b7280; margin-top:2px; }
+        .amount { font-size:15px; font-weight:800; color:#052e16; white-space:nowrap; margin-left:auto; }
+        .badge-green { font-size:13px; font-weight:700; color:#16a34a; margin-left:auto; }
+        .badge-red { font-size:13px; font-weight:700; color:#ef4444; margin-left:auto; }
+        .badge-gray { font-size:13px; font-weight:600; color:#6b7280; margin-left:auto; }
+        .settle-arrow { font-size:14px; font-weight:700; color:#052e16; flex:1; }
+        .settle-amount { font-size:16px; font-weight:800; color:#052e16; }
+        .loading { text-align:center; padding:60px 20px; color:#6b7280; }
+        .error { text-align:center; padding:60px 20px; color:#ef4444; }
+        .cta { background:white; border:1px solid #bbf7d0; border-radius:14px; padding:18px 20px; text-align:center; margin-top:20px; }
+        .cta p { font-size:13px; color:#6b7280; margin-bottom:12px; }
+        .cta a { display:inline-block; padding:12px 24px; background:linear-gradient(135deg,#16a34a,#0d9488); color:white; border-radius:10px; font-size:14px; font-weight:700; text-decoration:none; }
+        .section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#6b7280; padding:14px 20px 6px; }
+        .tab-bar { display:flex; background:#f0fdf4; border-radius:12px; padding:4px; gap:4px; margin-bottom:14px; }
+        .tab-btn { flex:1; padding:9px; border:none; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; background:transparent; color:#6b7280; transition:all 0.15s; }
+        .tab-btn.active { background:white; color:#052e16; box-shadow:0 1px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="logo">🌱</div>
+    <div>
+        <div class="topbar-title">Sprout</div>
+        <div class="topbar-sub">Shared trip view</div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="content"><div class="loading">Loading trip…</div></div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script>
+(async function() {
+    const params = new URLSearchParams(window.location.search);
+    const code   = params.get('code');
+    const el     = document.getElementById('content');
+
+    if (!code) {
+        el.innerHTML = '<div class="error">No trip code found in URL.</div>'; return;
+    }
+
+    // ── Load trip data ──────────────────────────────────────────────
+    let trip = null;
+
+    if (FIREBASE_ENABLED && typeof firebase !== 'undefined') {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        try {
+            const db   = firebase.firestore();
+            const snap = await db.collection('shared_trips').doc(code).get();
+            if (snap.exists) trip = snap.data();
+        } catch (e) { console.error(e); }
+    }
+
+    if (!trip) {
+        el.innerHTML = `<div class="error" style="padding:60px 20px">
+            <div style="font-size:40px;margin-bottom:12px">🔍</div>
+            <div style="font-size:16px;font-weight:700;color:#052e16;margin-bottom:8px">Trip not found</div>
+            <div style="font-size:13px;color:#6b7280">This link may have expired or Firebase isn't set up yet.</div>
+        </div>`;
+        return;
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────
+    const CATS = [
+        { name:'Food & Dining',emoji:'🍽️',color:'#f97316'},
+        { name:'Shopping',emoji:'🛍️',color:'#db2777'},
+        { name:'Transport',emoji:'🚗',color:'#0891b2'},
+        { name:'Entertainment',emoji:'🎭',color:'#7c3aed'},
+        { name:'Health & Fitness',emoji:'🏥',color:'#059669'},
+        { name:'Travel',emoji:'✈️',color:'#0284c7'},
+        { name:'Utilities',emoji:'💡',color:'#d97706'},
+        { name:'Other',emoji:'📦',color:'#6b7280'},
+    ];
+    const cat = name => CATS.find(c => c.name === name) || CATS[7];
+    const fmt = d => { try { return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); } catch { return d; } };
+    const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    const members    = trip.members  || [];
+    const expenses   = trip.expenses || [];
+    const memberMap  = {};
+    members.forEach(m => { memberMap[m.id] = m.name; });
+    const total      = expenses.reduce((s, e) => s + e.amount, 0);
+    const start      = fmt(trip.startDate);
+    const end        = trip.endDate && trip.endDate !== trip.startDate ? fmt(trip.endDate) : '';
+    const dateStr    = start ? (end ? `${start} – ${end}` : start) : '';
+
+    // ── Settlement ─────────────────────────────────────────────────
+    const balances = {};
+    members.forEach(m => { balances[m.id] = 0; });
+    expenses.forEach(exp => {
+        if (!exp.splitBetween?.length) return;
+        const per = exp.amount / exp.splitBetween.length;
+        balances[exp.paidBy] = (balances[exp.paidBy] || 0) + exp.amount;
+        exp.splitBetween.forEach(id => { balances[id] = (balances[id] || 0) - per; });
+    });
+
+    const cp = Object.entries(balances).filter(([,b])=>b>0.01).map(([id,b])=>({id,b})).sort((a,c)=>c.b-a.b);
+    const cn = Object.entries(balances).filter(([,b])=>b<-0.01).map(([id,b])=>({id,b:-b})).sort((a,c)=>c.b-a.b);
+    const txns = [];
+    let ii=0,jj=0;
+    const cpc=cp.map(x=>({...x})), cnc=cn.map(x=>({...x}));
+    while (ii<cpc.length && jj<cnc.length) {
+        const amt = Math.min(cpc[ii].b, cnc[jj].b);
+        if (amt>0.005) txns.push({from:cnc[jj].id, to:cpc[ii].id, amount:amt});
+        cpc[ii].b-=amt; cnc[jj].b-=amt;
+        if (cpc[ii].b<0.005) ii++;
+        if (cnc[jj].b<0.005) jj++;
+    }
+
+    // ── Render ─────────────────────────────────────────────────────
+    let currentTab = 'split';
+
+    function render() {
+        const sortedExp = [...expenses].sort((a,b)=>b.date.localeCompare(a.date));
+        const perPerson = members.length ? total / members.length : 0;
+
+        el.innerHTML = `
+            <div class="hero">
+                <div class="hero-emoji">${trip.emoji || '✈️'}</div>
+                <div class="hero-name">${esc(trip.name)}</div>
+                ${dateStr ? `<div class="hero-date">${dateStr}</div>` : ''}
+                <div style="margin-top:14px">
+                    <div class="hero-label">Total expenses</div>
+                    <div class="hero-total">$${total.toFixed(2)}</div>
+                </div>
+                <div style="margin-top:12px;display:flex;flex-wrap:wrap">
+                    ${members.map(m=>`<span class="pill">${esc(m.name)}</span>`).join('')}
+                </div>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-btn ${currentTab==='split'?'active':''}" onclick="switchTab('split')">Split</button>
+                <button class="tab-btn ${currentTab==='expenses'?'active':''}" onclick="switchTab('expenses')">Expenses</button>
+            </div>
+
+            <div id="tabBody">
+                ${currentTab === 'split' ? `
+                <div class="card">
+                    <div class="card-header"><div class="card-title">Balance per person &nbsp;<span style="font-weight:500;color:#6b7280">· $${perPerson.toFixed(2)} avg</span></div></div>
+                    ${members.map(m => {
+                        const b = Math.round((balances[m.id]||0)*100)/100;
+                        const cls = b>0.01 ? 'badge-green' : b<-0.01 ? 'badge-red' : 'badge-gray';
+                        const lbl = b>0.01 ? `gets back $${b.toFixed(2)}` : b<-0.01 ? `owes $${Math.abs(b).toFixed(2)}` : 'settled ✓';
+                        return `<div class="row">
+                            <div class="avatar">${(m.name[0]||'?').toUpperCase()}</div>
+                            <div><div class="label">${esc(m.name)}</div></div>
+                            <div class="${cls}">${lbl}</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div class="card">
+                    <div class="card-header"><div class="card-title">How to settle up 💸</div></div>
+                    ${txns.length ? txns.map(tx=>`
+                        <div class="row">
+                            <div class="emoji-icon" style="background:#fef2f2">💸</div>
+                            <div class="settle-arrow">
+                                <span style="color:#ef4444">${esc(memberMap[tx.from]||tx.from)}</span>
+                                &nbsp;→&nbsp;
+                                <span style="color:#16a34a">${esc(memberMap[tx.to]||tx.to)}</span>
+                            </div>
+                            <div class="settle-amount">$${tx.amount.toFixed(2)}</div>
+                        </div>`).join('')
+                    : `<div class="row" style="justify-content:center;color:#6b7280;font-size:13px">✅ Everyone is settled up!</div>`}
+                </div>` : `
+                <div class="card">
+                    <div class="card-header"><div class="card-title">${sortedExp.length} expense${sortedExp.length!==1?'s':''} · $${total.toFixed(2)} total</div></div>
+                    ${sortedExp.length ? sortedExp.map(exp=>{
+                        const c = cat(exp.category);
+                        const paidName = memberMap[exp.paidBy]||'?';
+                        const count = exp.splitBetween?.length||1;
+                        const per = (exp.amount/count).toFixed(2);
+                        return `<div class="row">
+                            <div class="emoji-icon" style="background:${c.color}18">${c.emoji}</div>
+                            <div style="flex:1;min-width:0">
+                                <div class="label" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(exp.name)}</div>
+                                <div class="sub">${fmt(exp.date)} · Paid by ${esc(paidName)} · $${per}/person</div>
+                            </div>
+                            <div class="amount">$${exp.amount.toFixed(2)}</div>
+                        </div>`;
+                    }).join('')
+                    : `<div class="row" style="justify-content:center;color:#6b7280;font-size:13px">No expenses yet</div>`}
+                </div>`}
+
+            <div class="cta">
+                <p>Track your own expenses and subscriptions with Sprout</p>
+                <a href="sign-up.html">Get Started Free →</a>
+            </div>
+        `;
+    }
+
+    window.switchTab = function(tab) {
+        currentTab = tab;
+        render();
+    };
+
+    render();
+})();
+</script>
+</body>
+</html>

@@ -21,11 +21,23 @@ function _bootApp(user) {
     _applyUserUI(user);
     subs      = loadSubs();
     spendings = loadSpendings();
+    trips     = loadTrips();
     _hideLoader();
     safeRun(setGreeting);
     safeRun(initGmailUI);
     safeRun(renderAll);
     safeRun(renderHomePage);
+    // Swipe-down to dismiss modals
+    setTimeout(() => {
+        const qaSheet = document.querySelector('.quick-add-sheet');
+        if (qaSheet) addSwipeClose(qaSheet, closeQuickAdd);
+        const spendSheet = document.querySelector('#spendModalBackdrop .modal');
+        if (spendSheet) addSwipeClose(spendSheet, closeSpendModal);
+        const ctSheet = document.querySelector('#createTripBackdrop .modal');
+        if (ctSheet) addSwipeClose(ctSheet, closeCreateTrip);
+        const teSheet = document.querySelector('#tripExpenseBackdrop .modal');
+        if (teSheet) addSwipeClose(teSheet, closeTripExpenseModal);
+    }, 200);
 }
 
 // ── Firebase path ──────────────────────────────────────────────────────
@@ -51,6 +63,7 @@ if (FIREBASE_ENABLED && typeof firebase !== 'undefined' && firebase.apps?.length
         if (cloud) {
             if (cloud.subs)      localStorage.setItem(getKey('data'),        JSON.stringify(cloud.subs));
             if (cloud.spendings) localStorage.setItem(getKey('spendings'),   JSON.stringify(cloud.spendings));
+            if (cloud.trips)     localStorage.setItem(getKey('trips'),       JSON.stringify(cloud.trips));
             if (cloud.settings?.monthly  != null) localStorage.setItem(getKey('budget'),     JSON.stringify({ monthly: cloud.settings.monthly }));
             if (cloud.settings?.catBudgets)        localStorage.setItem(getKey('cat_budgets'), JSON.stringify(cloud.settings.catBudgets));
         }

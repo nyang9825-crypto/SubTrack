@@ -89,6 +89,32 @@ function subIconHTML(sub) {
         ` onerror="onSubLogoError(this)" /></div>`;
 }
 
+// Swipe-down to dismiss a bottom-sheet or modal panel
+function addSwipeClose(el, closeFn, threshold = 100) {
+    if (!el) return;
+    let startY = 0, curY = 0;
+    el.addEventListener('touchstart', e => {
+        startY = curY = e.touches[0].clientY;
+        el.style.transition = 'none';
+    }, { passive: true });
+    el.addEventListener('touchmove', e => {
+        curY = e.touches[0].clientY;
+        const dy = Math.max(0, curY - startY);
+        el.style.transform = `translateY(${dy}px)`;
+    }, { passive: true });
+    el.addEventListener('touchend', () => {
+        const dy = curY - startY;
+        el.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1)';
+        if (dy > threshold) {
+            el.style.transform = `translateY(110%)`;
+            setTimeout(() => { closeFn(); el.style.transform = ''; el.style.transition = ''; }, 260);
+        } else {
+            el.style.transform = '';
+            setTimeout(() => { el.style.transition = ''; }, 300);
+        }
+    });
+}
+
 function renderSubItem(sub, showDays = false) {
     const days = daysUntil(sub.renewalDate);
     const monthly = toMonthly(sub.cost, sub.cycle);

@@ -72,6 +72,9 @@
         <button class="nav-item" onclick="showPage('spending')">
             <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span> Spending & Budget
         </button>
+        <button class="nav-item" onclick="showPage('trips')">
+            <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.45 2 2 0 0 1 3.59 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.27a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span> Trips & Events
+        </button>
 
         <div class="sidebar-bottom">
             <div class="user-badge">
@@ -360,7 +363,142 @@
             </div>
         </div>
 
+        <!-- Trips & Events -->
+        <div id="page-trips" class="page">
+            <div class="page-header" id="tripsPageHeader">
+                <h2>Trips & Events</h2>
+                <p>Track shared expenses and split costs with friends.</p>
+            </div>
+            <div id="tripListView"></div>
+            <div id="tripDetailView" style="display:none"></div>
+        </div>
+
     </main>
+</div>
+
+<!-- Create / Edit Trip Modal -->
+<div id="createTripBackdrop" class="modal-backdrop hidden" onclick="if(event.target===this)closeCreateTrip()">
+    <div class="modal" style="max-width:480px;max-height:90vh;overflow-y:auto">
+        <div class="modal-head">
+            <h3 id="ctModalTitle">New Trip</h3>
+            <button class="close-btn" onclick="closeCreateTrip()">✕</button>
+        </div>
+        <div style="padding:0 24px 8px">
+            <!-- Emoji + Name -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <button id="ctTripEmoji" style="width:56px;height:56px;border-radius:16px;border:2px solid var(--border);background:#f0fdf4;font-size:28px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">✈️</button>
+                <div style="flex:1">
+                    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Trip Name</label>
+                    <input type="text" id="ctTripName" placeholder="e.g. Thailand Trip, Birthday Dinner"
+                        style="width:100%;margin-top:5px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
+                        onkeydown="if(event.key==='Enter')saveTrip()" />
+                </div>
+            </div>
+
+            <!-- Emoji picker -->
+            <div id="ctEmojiPicker" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px"></div>
+
+            <!-- Dates -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+                <div>
+                    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Start Date</label>
+                    <input type="date" id="ctStartDate" style="width:100%;margin-top:5px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">End Date</label>
+                    <input type="date" id="ctEndDate" style="width:100%;margin-top:5px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+                </div>
+            </div>
+
+            <!-- Members -->
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Members</label>
+            <div id="ctMemberList" style="margin-top:8px;margin-bottom:10px"></div>
+            <div style="display:flex;gap:8px;margin-bottom:20px">
+                <input type="text" id="ctMemberName" placeholder="Add a member name…"
+                    style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();addCtMember()}" />
+                <button onclick="addCtMember()" style="padding:10px 18px;background:var(--primary-xlight);border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;color:var(--primary-dark);cursor:pointer;font-family:inherit;white-space:nowrap">+ Add</button>
+            </div>
+        </div>
+        <div class="modal-actions" style="display:flex!important">
+            <button class="btn-cancel" onclick="closeCreateTrip()">Cancel</button>
+            <button class="btn-save" onclick="saveTrip()">Save Trip</button>
+        </div>
+    </div>
+</div>
+
+<!-- Trip Expense Modal -->
+<div id="tripExpenseBackdrop" class="modal-backdrop hidden" onclick="if(event.target===this)closeTripExpenseModal()">
+    <div class="modal" style="max-width:480px;max-height:90vh;overflow-y:auto">
+        <div class="modal-head">
+            <h3 id="teModalTitle">Add Expense</h3>
+            <button class="close-btn" onclick="closeTripExpenseModal()">✕</button>
+        </div>
+
+        <!-- Amount -->
+        <div style="padding:16px 24px 0">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Amount</label>
+            <div style="position:relative;margin-top:6px">
+                <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:22px;color:var(--muted);font-weight:700">$</span>
+                <input type="number" id="teAmount" placeholder="0.00" step="0.01" min="0"
+                    style="width:100%;padding:14px 16px 14px 38px;font-size:28px;font-weight:800;color:var(--text);border:2px solid var(--border);border-radius:12px;outline:none;font-family:inherit"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
+                    onkeydown="if(event.key==='Enter')saveTripExpense()" />
+            </div>
+        </div>
+
+        <!-- Description + Date -->
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 24px 0">
+            <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Description</label>
+                <input type="text" id="teName" placeholder="What was this for?"
+                    style="width:100%;margin-top:5px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
+                    onkeydown="if(event.key==='Enter')saveTripExpense()" />
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Date</label>
+                <input type="date" id="teDate" style="width:148px;margin-top:5px;padding:11px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+            </div>
+        </div>
+
+        <!-- Category -->
+        <div style="padding:12px 24px 0">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Category</label>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
+                <button class="spend-cat-btn te-cat-btn active" data-cat="Food & Dining"    onclick="selectTeCat('Food & Dining')">🍽️<br><span>Food</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Shopping"         onclick="selectTeCat('Shopping')">🛍️<br><span>Shopping</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Transport"        onclick="selectTeCat('Transport')">🚗<br><span>Transport</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Entertainment"    onclick="selectTeCat('Entertainment')">🎭<br><span>Fun</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Health & Fitness" onclick="selectTeCat('Health & Fitness')">🏥<br><span>Health</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Travel"           onclick="selectTeCat('Travel')">✈️<br><span>Travel</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Utilities"        onclick="selectTeCat('Utilities')">💡<br><span>Bills</span></button>
+                <button class="spend-cat-btn te-cat-btn"        data-cat="Other"            onclick="selectTeCat('Other')">📦<br><span>Other</span></button>
+            </div>
+        </div>
+
+        <!-- Paid by -->
+        <div style="padding:14px 24px 0">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Paid by</label>
+            <div id="tePaidBy" style="margin-top:8px"></div>
+        </div>
+
+        <!-- Split between -->
+        <div style="padding:14px 24px 20px">
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Split between</label>
+            <div id="teSplitBetween" style="margin-top:8px"></div>
+        </div>
+
+        <div class="modal-actions" style="display:flex!important">
+            <button class="btn-cancel" onclick="closeTripExpenseModal()">Cancel</button>
+            <button class="btn-save" onclick="saveTripExpense()">Save Expense</button>
+        </div>
+    </div>
 </div>
 
 <!-- Mobile bottom navigation -->
@@ -377,8 +515,8 @@
     <button class="mobile-nav-item" onclick="showPage('dashboard')">
         <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Overview</span>
     </button>
-    <button class="mobile-nav-item" onclick="showPage('analytics')">
-        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span><span>Analytics</span>
+    <button class="mobile-nav-item" onclick="showPage('trips')">
+        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.45 2 2 0 0 1 3.59 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.27a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span>Trips</span>
     </button>
 </nav>
 
@@ -661,6 +799,7 @@
 <script src="js/auth.js"></script>
 <script src="js/db.js"></script>
 <script src="js/spending.js"></script>
+<script src="js/trips.js"></script>
 <script src="js/home.js"></script>
 <script src="js/gmail.js"></script>
 <script src="js/csv.js"></script>
