@@ -397,14 +397,9 @@
                         onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
                 </div>
             </div>
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Members</label>
-            <div id="ctMemberList" style="margin-top:8px;margin-bottom:10px"></div>
-            <div style="display:flex;gap:8px;margin-bottom:20px">
-                <input type="text" id="ctMemberName" placeholder="Add a member name…"
-                    style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none"
-                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
-                    onkeydown="if(event.key==='Enter'){event.preventDefault();addCtMember()}" />
-                <button onclick="addCtMember()" style="padding:10px 18px;background:var(--primary-xlight);border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;color:var(--primary-dark);cursor:pointer;font-family:inherit;white-space:nowrap">+ Add</button>
+            <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+                <div style="font-size:18px">🔗</div>
+                <div style="font-size:12px;color:#15803d;font-weight:600;line-height:1.4">Save the trip, then share the invite link — friends join by signing up.</div>
             </div>
         </div>
         <div class="modal-actions" style="display:flex!important">
@@ -706,10 +701,11 @@
         <!-- Category header -->
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
             <div id="qaCatIcon" style="width:54px;height:54px;border-radius:16px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🍽️</div>
-            <div>
+            <div style="flex:1">
                 <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.3px" id="qaCatName">Food & Dining</div>
                 <div style="font-size:12px;color:var(--muted);margin-top:1px">How much did you spend?</div>
             </div>
+            <button class="close-btn" onclick="closeQuickAdd()" style="flex-shrink:0">✕</button>
         </div>
 
         <!-- Amount — BIG -->

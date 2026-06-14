@@ -48,6 +48,13 @@ function _bootApp(user) {
             if (el) setupCurrencyInput(el);
         });
     }, 300);
+
+    // Handle trip invite link (?joinTrip=SHARECODE)
+    const _joinCode = new URLSearchParams(window.location.search).get('joinTrip');
+    if (_joinCode) {
+        history.replaceState({}, '', window.location.pathname);
+        setTimeout(() => { if (typeof joinTripByCode === 'function') joinTripByCode(_joinCode); }, 600);
+    }
 }
 
 // ── Firebase path ──────────────────────────────────────────────────────
@@ -55,7 +62,8 @@ if (FIREBASE_ENABLED && typeof firebase !== 'undefined' && firebase.apps?.length
 
     firebase.auth().onAuthStateChanged(async (firebaseUser) => {
         if (!firebaseUser) {
-            window.location.href = 'sign-up.html';
+            const _p = new URLSearchParams(window.location.search).get('joinTrip');
+            window.location.href = 'sign-up.html' + (_p ? '?joinTrip=' + encodeURIComponent(_p) : '');
             return;
         }
 

@@ -70,6 +70,22 @@ async function dbSetSharedTrip(shareCode, tripData) {
     } catch (e) { console.error('[db] share trip error:', e); }
 }
 
+async function dbJoinTrip(shareCode, memberInfo) {
+    if (!_db) return;
+    try {
+        const ref = _db.collection('shared_trips').doc(shareCode);
+        const snap = await ref.get();
+        if (!snap.exists) throw new Error('Trip not found');
+        const data    = snap.data();
+        const members = data.members || [];
+        if (!members.find(m => m.uid === memberInfo.uid)) {
+            members.push(memberInfo);
+            await ref.update({ members, updatedAt: new Date().toISOString() });
+        }
+        return { ...data, members };
+    } catch (e) { console.error('[db] joinTrip error:', e); return null; }
+}
+
 async function dbGetSharedTrip(shareCode) {
     if (!_db) return null;
     try {

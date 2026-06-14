@@ -4,7 +4,6 @@ let activeTripId = null;
 let tripTab = 'expenses';
 let tripExpenseEditId = null;
 let selectedTeCat = 'Food & Dining';
-let createTripMembers = [];
 let createTripEditId = null;
 let createTripSelectedEmoji = '✈️';
 
@@ -142,13 +141,35 @@ function renderTripDetail() {
             </button>
         </div>
 
-        <div style="background:linear-gradient(135deg,#052e16,#14532d);border-radius:18px;padding:20px 22px;margin-bottom:18px;color:white">
+        <div style="background:linear-gradient(135deg,#052e16,#14532d);border-radius:18px;padding:20px 22px;margin-bottom:16px;color:white">
             <div style="font-size:11px;opacity:0.65;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Total trip expenses</div>
             <div style="font-size:36px;font-weight:800;letter-spacing:-1.5px;line-height:1">${fmtMoney(total)}</div>
-            ${trip.members?.length ? `
-            <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px">
-                ${trip.members.map(m => `<span style="padding:4px 10px;background:rgba(255,255,255,0.15);border-radius:99px;font-size:12px;font-weight:600">${escHtml(m.name)}</span>`).join('')}
-            </div>` : ''}
+        </div>
+
+        <!-- Members card -->
+        <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${trip.members?.length?'12px':'0'}">
+                <div style="font-size:13px;font-weight:700;color:var(--text)">Members · ${trip.members?.length||0}</div>
+                <button onclick="copyInviteLink('${trip.id}')"
+                    style="display:flex;align-items:center;gap:6px;padding:6px 14px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-weight:700;color:#15803d;cursor:pointer;font-family:inherit">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Invite
+                </button>
+            </div>
+            ${(trip.members||[]).map(m => {
+                const isOwner = m.isOwner || m.uid === trip.ownerId;
+                const initials = (m.name||'?')[0].toUpperCase();
+                return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #f0fdf4">
+                    <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;flex-shrink:0">${initials}</div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(m.name)}</div>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;${isOwner?'background:#f0fdf4;color:#15803d':'background:#f8fafc;color:#6b7280'}">
+                        ${isOwner?'👑 Owner':'✅ Joined'}
+                    </span>
+                </div>`;
+            }).join('')}
+            ${!(trip.members?.length) ? `<div style="font-size:12px;color:var(--muted);padding:4px 0">No members yet — share the invite link.</div>` : ''}
         </div>
 
         <div style="display:flex;background:#f0fdf4;border-radius:12px;padding:4px;gap:4px;margin-bottom:18px">
@@ -315,7 +336,6 @@ function renderTripSplit(el) {
 function openCreateTrip(tripId = null) {
     createTripEditId = tripId || null;
     const trip = tripId ? trips.find(t => t.id === tripId) : null;
-    createTripMembers      = trip ? JSON.parse(JSON.stringify(trip.members || [])) : [];
     createTripSelectedEmoji = trip?.emoji || '✈️';
 
     document.getElementById('ctModalTitle').textContent = tripId ? 'Edit Trip' : 'New Trip';
@@ -324,7 +344,6 @@ function openCreateTrip(tripId = null) {
     document.getElementById('ctEndDate').value   = trip?.endDate   || '';
     document.getElementById('ctTripEmoji').textContent = createTripSelectedEmoji;
     renderCtEmojis();
-    renderCtMembers();
     document.getElementById('createTripBackdrop').classList.remove('hidden');
     setTimeout(() => document.getElementById('ctTripName').focus(), 60);
 }
@@ -348,38 +367,6 @@ function selectTripEmoji(e) {
     renderCtEmojis();
 }
 
-function renderCtMembers() {
-    const el = document.getElementById('ctMemberList');
-    if (!el) return;
-    if (!createTripMembers.length) {
-        el.innerHTML = `<div style="font-size:12px;color:var(--muted);padding:8px 0">Add people to split expenses with</div>`;
-        return;
-    }
-    el.innerHTML = createTripMembers.map((m, i) => `
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0fdf4">
-            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;flex-shrink:0">${(m.name[0]||'?').toUpperCase()}</div>
-            <span style="flex:1;font-size:14px;font-weight:600;color:var(--text)">${escHtml(m.name)}</span>
-            <button onclick="removeCtMember(${i})" style="padding:4px 8px;border:none;background:none;cursor:pointer;color:#d1d5db;font-size:16px;line-height:1">✕</button>
-        </div>`).join('');
-}
-
-function addCtMember() {
-    const input = document.getElementById('ctMemberName');
-    const name  = input.value.trim();
-    if (!name) return;
-    if (createTripMembers.some(m => m.name.toLowerCase() === name.toLowerCase())) {
-        toast('Already added', 'error'); return;
-    }
-    createTripMembers.push({ id: 'm' + Date.now(), name });
-    input.value = '';
-    renderCtMembers();
-    input.focus();
-}
-
-function removeCtMember(idx) {
-    createTripMembers.splice(idx, 1);
-    renderCtMembers();
-}
 
 function saveTrip() {
     const name      = document.getElementById('ctTripName').value.trim();
@@ -387,27 +374,26 @@ function saveTrip() {
     const endDate   = document.getElementById('ctEndDate').value;
     if (!name) { toast('Enter a trip name', 'error'); return; }
 
+    const uid  = (typeof currentUid !== 'undefined' && currentUid) ? currentUid : null;
+    const user = (() => { try { return JSON.parse(localStorage.getItem('sprout_user') || 'null'); } catch { return null; } })();
+    const ownerName = user?.name || 'You';
+
     if (createTripEditId) {
         const idx = trips.findIndex(t => t.id === createTripEditId);
         if (idx !== -1) {
-            trips[idx] = { ...trips[idx], name, emoji: createTripSelectedEmoji, startDate, endDate, members: createTripMembers };
+            trips[idx] = { ...trips[idx], name, emoji: createTripSelectedEmoji, startDate, endDate };
         }
         toast('Trip updated');
     } else {
-        // Auto-add "You" as first member if list is empty
-        if (!createTripMembers.length) {
-            const user = (typeof getUser === 'function') ? getUser() : null;
-            const youName = user?.name?.split(' ')[0] || 'You';
-            createTripMembers.unshift({ id: 'm_you_' + Date.now(), name: youName });
-        }
+        const ownerMember = { id: uid || ('u_' + Date.now()), uid, name: ownerName, email: user?.email || '', joinedAt: new Date().toISOString(), isOwner: true };
         trips.push({
             id: 'trip_' + Date.now(),
             shareCode: genShareCode(),
             name, emoji: createTripSelectedEmoji, startDate, endDate,
-            members: createTripMembers,
+            members: [ownerMember],
             expenses: [],
             createdAt: new Date().toISOString(),
-            ownerId: (typeof currentUid !== 'undefined') ? currentUid : null,
+            ownerId: uid,
         });
         toast(`"${name}" created!`);
     }
@@ -597,32 +583,102 @@ function deleteTripExpense(id) {
     });
 }
 
-// ── Share ─────────────────────────────────────────────────────────────
+// ── Share / Invite ─────────────────────────────────────────────────────
+async function _pushTripToFirestore(trip) {
+    if (typeof dbSetSharedTrip !== 'function') return;
+    try {
+        await dbSetSharedTrip(trip.shareCode, {
+            name: trip.name, emoji: trip.emoji,
+            startDate: trip.startDate, endDate: trip.endDate,
+            ownerId: trip.ownerId,
+            members: trip.members || [],
+            expenses: (trip.expenses || []).map(({ receiptThumb, ...e }) => e),
+            updatedAt: new Date().toISOString(),
+        });
+    } catch(e) { console.error(e); }
+}
+
+// Invite link — opens app (or sign-up) and auto-joins the trip
+async function copyInviteLink(tripId) {
+    const trip = trips.find(t => t.id === tripId);
+    if (!trip) return;
+    await _pushTripToFirestore(trip);
+    const base = window.location.href.replace(/[?#].*$/, '').replace(/app\.html$/, '');
+    const url  = `${base}app.html?joinTrip=${trip.shareCode}`;
+    if (navigator.share) {
+        try { await navigator.share({ title: `Join ${trip.emoji} ${trip.name} on Sprout`, url }); return; } catch {}
+    }
+    try {
+        await navigator.clipboard.writeText(url);
+        toast('Invite link copied! 🔗');
+    } catch {
+        prompt('Copy this invite link:', url);
+    }
+}
+
+// Share read-only summary (still accessible from header share button)
 async function shareTripLink(tripId) {
     const trip = trips.find(t => t.id === tripId);
     if (!trip) return;
-
-    if (typeof dbSetSharedTrip === 'function') {
-        try {
-            await dbSetSharedTrip(trip.shareCode, {
-                name: trip.name, emoji: trip.emoji,
-                startDate: trip.startDate, endDate: trip.endDate,
-                members: trip.members,
-                expenses: (trip.expenses || []).map(({ receiptThumb, ...e }) => e),
-            });
-        } catch {}
-    }
-
-    const base = window.location.href.replace(/app\.html.*$/, '');
+    await _pushTripToFirestore(trip);
+    const base = window.location.href.replace(/[?#].*$/, '').replace(/app\.html$/, '');
     const url  = `${base}trip.html?code=${trip.shareCode}`;
-
     if (navigator.share) {
         try { await navigator.share({ title: `${trip.emoji} ${trip.name} – Split`, url }); return; } catch {}
     }
     try {
         await navigator.clipboard.writeText(url);
-        toast('Share link copied!');
+        toast('Summary link copied!');
     } catch {
-        prompt('Copy this link to share:', url);
+        prompt('Copy this link:', url);
     }
+}
+
+// Join a trip via invite link
+async function joinTripByCode(shareCode) {
+    const user = (() => { try { return JSON.parse(localStorage.getItem('sprout_user') || 'null'); } catch { return null; } })();
+    if (!user) return;
+
+    toast('Joining trip…');
+    let tripData = null;
+    if (typeof dbGetSharedTrip === 'function') {
+        tripData = await dbGetSharedTrip(shareCode);
+    }
+    if (!tripData) { toast('Trip not found or expired', 'error'); return; }
+
+    const uid = (typeof currentUid !== 'undefined' && currentUid) ? currentUid : user.uid;
+    const alreadyIn = (tripData.members || []).find(m => m.uid === uid);
+
+    if (!alreadyIn) {
+        const newMember = { id: uid, uid, name: user.name, email: user.email || '', joinedAt: new Date().toISOString(), isOwner: false };
+        if (typeof dbJoinTrip === 'function') {
+            const updated = await dbJoinTrip(shareCode, newMember);
+            if (updated) tripData.members = updated.members;
+        } else {
+            tripData.members = [...(tripData.members || []), newMember];
+        }
+    }
+
+    // Add or update in local trips
+    const existingIdx = trips.findIndex(t => t.shareCode === shareCode);
+    const localTrip = {
+        id:        existingIdx !== -1 ? trips[existingIdx].id : ('trip_' + Date.now()),
+        shareCode,
+        name:      tripData.name,
+        emoji:     tripData.emoji,
+        startDate: tripData.startDate,
+        endDate:   tripData.endDate,
+        ownerId:   tripData.ownerId,
+        members:   tripData.members || [],
+        expenses:  tripData.expenses || [],
+        createdAt: tripData.createdAt || new Date().toISOString(),
+        isShared:  true,
+    };
+    if (existingIdx !== -1) trips[existingIdx] = localTrip;
+    else trips.push(localTrip);
+
+    saveTrips();
+    activeTripId = localTrip.id;
+    showPage('trips');
+    toast(`${alreadyIn ? 'Already in' : 'Joined'} ${tripData.emoji} ${tripData.name}!`);
 }
