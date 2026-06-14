@@ -410,7 +410,7 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 13px 20px;
+    padding: 17px 20px;
     border-bottom: 1px solid var(--border-soft);
     transition: background 0.12s;
 }

@@ -62,6 +62,37 @@ const KNOWN_SENDERS = {
     'midjourney.com':     { name: 'Midjourney',            emoji: '🎨', cost: 10.00, category: 'Software' },
     'cursor.sh':          { name: 'Cursor',                emoji: '💻', cost: 20.00, category: 'Software' },
     'linear.app':         { name: 'Linear',                emoji: '📋', cost: 8.00,  category: 'Software' },
+    // Telecom & Internet
+    'att.com':            { name: 'AT&T',                  emoji: '📱', cost: 65.00, category: 'Other' },
+    'verizon.com':        { name: 'Verizon',               emoji: '📱', cost: 70.00, category: 'Other' },
+    't-mobile.com':       { name: 'T-Mobile',              emoji: '📱', cost: 60.00, category: 'Other' },
+    'comcast.com':        { name: 'Xfinity / Comcast',     emoji: '📡', cost: 60.00, category: 'Other' },
+    'xfinity.com':        { name: 'Xfinity / Comcast',     emoji: '📡', cost: 60.00, category: 'Other' },
+    'spectrum.com':       { name: 'Spectrum',              emoji: '📡', cost: 50.00, category: 'Other' },
+    'cox.com':            { name: 'Cox',                   emoji: '📡', cost: 55.00, category: 'Other' },
+    // Insurance
+    'geico.com':          { name: 'GEICO',                 emoji: '🛡️', cost: 120.00, category: 'Finance' },
+    'progressive.com':    { name: 'Progressive',           emoji: '🛡️', cost: 110.00, category: 'Finance' },
+    'statefarm.com':      { name: 'State Farm',            emoji: '🛡️', cost: 130.00, category: 'Finance' },
+    'allstate.com':       { name: 'Allstate',              emoji: '🛡️', cost: 125.00, category: 'Finance' },
+    // Finance & payments
+    'paypal.com':         { name: 'PayPal',                emoji: '💳', cost: 0.00,  category: 'Finance' },
+    'chase.com':          { name: 'Chase',                 emoji: '🏦', cost: 0.00,  category: 'Finance' },
+    'bankofamerica.com':  { name: 'Bank of America',       emoji: '🏦', cost: 0.00,  category: 'Finance' },
+    // Fitness
+    'peloton.com':        { name: 'Peloton',               emoji: '🚴', cost: 44.00, category: 'Health & Fitness' },
+    'strava.com':         { name: 'Strava',                emoji: '🏃', cost: 7.99,  category: 'Health & Fitness' },
+    'myfitnesspal.com':   { name: 'MyFitnessPal',          emoji: '🏋️', cost: 9.99,  category: 'Health & Fitness' },
+    // Productivity & dev
+    'atlassian.com':      { name: 'Atlassian / Jira',      emoji: '📋', cost: 8.15,  category: 'Software' },
+    'jetbrains.com':      { name: 'JetBrains',             emoji: '💻', cost: 24.90, category: 'Software' },
+    'netlify.com':        { name: 'Netlify',               emoji: '☁️', cost: 19.00, category: 'Software' },
+    'vercel.com':         { name: 'Vercel',                emoji: '☁️', cost: 20.00, category: 'Software' },
+    'heroku.com':         { name: 'Heroku',                emoji: '☁️', cost: 7.00,  category: 'Software' },
+    'digitalocean.com':   { name: 'DigitalOcean',          emoji: '☁️', cost: 6.00,  category: 'Software' },
+    'aws.amazon.com':     { name: 'AWS',                   emoji: '☁️', cost: 20.00, category: 'Cloud Storage' },
+    'cloud.google.com':   { name: 'Google Cloud',          emoji: '☁️', cost: 10.00, category: 'Cloud Storage' },
+    'azure.com':          { name: 'Microsoft Azure',       emoji: '☁️', cost: 20.00, category: 'Cloud Storage' },
 };
 
 // name → Google favicon URL at 64px (first matching domain wins for duplicates)
@@ -84,5 +115,9 @@ const SERVICE_CATALOG = (function () {
 const BILLING_KEYWORDS = [
     'receipt', 'invoice', 'billing', 'subscription', 'renewal',
     'payment confirmation', 'order confirmation', 'your order',
-    'membership', 'plan', 'charge', 'statement'
+    'membership', 'plan', 'charge', 'statement',
+    'your bill', 'monthly bill', 'payment received', 'payment processed',
+    'autopay', 'auto-pay', 'automatic payment', 'transaction confirmation',
+    'payment due', 'amount due', 'your statement', 'your receipt',
+    'successfully charged', 'thank you for your payment', 'payment successful',
 ];

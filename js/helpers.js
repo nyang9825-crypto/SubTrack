@@ -72,6 +72,12 @@ function letterAvatar(sub) {
     return `<div class="sub-emoji letter-avatar" style="background:${color}18;border-color:${color}30;color:${color}">${letter}</div>`;
 }
 
+function onSubLogoError(img) {
+    const color = img.dataset.color;
+    const letter = img.dataset.letter;
+    img.parentElement.outerHTML = `<div class="sub-emoji letter-avatar" style="background:${color}18;border-color:${color}30;color:${color}">${letter}</div>`;
+}
+
 function subIconHTML(sub) {
     const logo = BRAND_LOGOS[sub.name];
     const bg   = subBgColor(sub.category);
@@ -79,8 +85,8 @@ function subIconHTML(sub) {
     const color  = CAT_COLORS[sub.category] || '#6b7280';
     const letter = (sub.name || '?')[0].toUpperCase();
     return `<div class="sub-emoji sub-logo" style="background:${bg}">` +
-        `<img src="${logo}" alt="${escHtml(sub.name)}" class="brand-logo"` +
-        ` onerror="this.outerHTML='<div class=\\"sub-emoji letter-avatar\\" style=\\"background:${color}18;border-color:${color}30;color:${color}\\">${letter}</div>'" /></div>`;
+        `<img src="${logo}" alt="${escHtml(sub.name)}" class="brand-logo" data-color="${color}" data-letter="${letter}"` +
+        ` onerror="onSubLogoError(this)" /></div>`;
 }
 
 function renderSubItem(sub, showDays = false) {
