@@ -3,379 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SubTrack — Subscription Manager</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>SubTrack — Track Every Subscription. Waste Nothing.</title>
+    <meta name="description" content="The eco-conscious way to manage your subscriptions. See what you spend, cut what you don't use, and reduce your digital footprint.">
+    <link rel="stylesheet" href="css/landing.css">
 </head>
 <body>
 
-<div id="app">
-
-    <!-- ── Sidebar ── -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="s-icon">📊</div>
+<!-- ─── NAV ─── -->
+<nav class="land-nav">
+    <div class="land-nav-inner">
+        <a href="#" class="land-logo">
+            <div class="land-logo-icon">🌿</div>
             <span>SubTrack</span>
+        </a>
+        <div class="land-nav-links">
+            <a href="#calculator">Calculator</a>
+            <a href="#features">Features</a>
+            <a href="#trust">Why SubTrack</a>
         </div>
-
-        <p class="nav-label">Menu</p>
-        <button class="nav-item active" onclick="showPage('dashboard')">
-            <span class="nav-icon">🏠</span> Dashboard
-        </button>
-        <button class="nav-item" onclick="showPage('subscriptions')">
-            <span class="nav-icon">📋</span> Subscriptions
-        </button>
-        <button class="nav-item" onclick="showPage('analytics')">
-            <span class="nav-icon">📈</span> Analytics
-        </button>
-        <button class="nav-item" onclick="showPage('upcoming')">
-            <span class="nav-icon">🔔</span> Upcoming Renewals
-        </button>
-
-        <div class="sidebar-bottom">
-            <div class="user-badge">
-                <div class="avatar">S</div>
-                <div class="user-badge-info">
-                    <div class="user-badge-name">SubTrack</div>
-                    <div class="user-badge-tier">Demo Mode</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ── Main ── -->
-    <main class="main">
-
-        <!-- Dashboard -->
-        <div id="page-dashboard" class="page active">
-            <div class="page-header">
-                <h2 id="greetingText">Good morning 👋</h2>
-                <p>Here's an overview of your subscriptions.</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card blue">
-                    <div class="stat-icon">💸</div>
-                    <p class="stat-label">Monthly Spend</p>
-                    <p class="stat-value">$<span id="dashMonthly">0.00</span></p>
-                    <p class="stat-sub">per month</p>
-                </div>
-                <div class="stat-card green">
-                    <div class="stat-icon">📅</div>
-                    <p class="stat-label">Yearly Spend</p>
-                    <p class="stat-value">$<span id="dashYearly">0.00</span></p>
-                    <p class="stat-sub">projected this year</p>
-                </div>
-                <div class="stat-card orange">
-                    <div class="stat-icon">📦</div>
-                    <p class="stat-label">Active Subscriptions</p>
-                    <p class="stat-value"><span id="dashCount">0</span></p>
-                    <p class="stat-sub">services tracked</p>
-                </div>
-                <div class="stat-card red">
-                    <div class="stat-icon">⚠️</div>
-                    <p class="stat-label">Renewals This Week</p>
-                    <p class="stat-value"><span id="dashWeekRenewals">0</span></p>
-                    <p class="stat-sub">coming up soon</p>
-                </div>
-            </div>
-
-            <!-- Gmail Scan Card -->
-            <div class="section-card" id="gmailCard" style="margin-bottom:20px">
-                <div class="section-head">
-                    <h3>📧 Auto-Detect from Gmail</h3>
-                    <span class="badge" id="gmailBadge">Not connected</span>
-                </div>
-                <div id="gmailBody" style="padding:20px 20px 24px">
-
-                    <!-- Step 1: needs Client ID -->
-                    <div id="gmailStepSetup">
-                        <p style="font-size:14px;color:var(--muted);margin-bottom:16px">
-                            Enter your Google OAuth Client ID to scan your inbox for subscription receipts automatically.
-                            <a href="#" onclick="toggleSetupHelp();return false" style="color:var(--blue);text-decoration:none;font-weight:600"> How do I get one?</a>
-                        </p>
-
-                        <div id="setupHelp" class="hidden" style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.7;color:var(--muted)">
-                            <strong style="color:var(--text);display:block;margin-bottom:8px">One-time setup (5 minutes, free):</strong>
-                            1. Go to <strong>console.cloud.google.com</strong> → New Project<br>
-                            2. Search for <strong>Gmail API</strong> → Enable it<br>
-                            3. Go to <strong>APIs &amp; Services → Credentials → Create Credentials → OAuth client ID</strong><br>
-                            4. Application type: <strong>Web application</strong><br>
-                            5. Authorized JavaScript origins: add <strong>http://localhost:8080</strong><br>
-                            6. Copy the <strong>Client ID</strong> and paste it below<br>
-                            7. Run the app with: <code style="background:#e2e8f0;padding:2px 6px;border-radius:4px">npx serve . -p 8080</code> then open <strong>http://localhost:8080</strong>
-                        </div>
-
-                        <div style="display:flex;gap:10px">
-                            <input type="text" id="clientIdInput"
-                                placeholder="Paste your Google Client ID here (ends in .apps.googleusercontent.com)"
-                                style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit" />
-                            <button onclick="saveClientId()" style="padding:10px 18px;background:var(--blue);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap">Save &amp; Connect</button>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: has Client ID -->
-                    <div id="gmailStepConnect" class="hidden" style="display:flex;align-items:center;gap:14px">
-                        <button onclick="connectGmail()" id="gmailConnectBtn"
-                            style="display:flex;align-items:center;gap:10px;padding:11px 20px;background:white;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="Google" />
-                            Sign in with Google
-                        </button>
-                        <span style="font-size:13px;color:var(--muted)">We only read email subjects &amp; senders — never email body content.</span>
-                    </div>
-
-                    <!-- Step 3: scanning -->
-                    <div id="gmailStepScanning" class="hidden" style="text-align:center;padding:10px 0">
-                        <div id="scanSpinner" style="font-size:24px;margin-bottom:8px">⏳</div>
-                        <p id="scanStatus" style="font-size:14px;color:var(--muted)">Connecting to Gmail…</p>
-                        <div style="height:6px;background:var(--border);border-radius:10px;margin-top:14px;overflow:hidden">
-                            <div id="scanProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--blue),#6366f1);border-radius:10px;transition:width 0.4s ease"></div>
-                        </div>
-                    </div>
-
-                    <!-- Step 4: done -->
-                    <div id="gmailStepDone" class="hidden" style="display:flex;align-items:center;gap:14px">
-                        <div style="width:36px;height:36px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✅</div>
-                        <div style="flex:1">
-                            <div style="font-size:14px;font-weight:600;color:var(--text)" id="gmailDoneText">Gmail connected</div>
-                            <div style="font-size:12px;color:var(--muted)" id="gmailDoneSub">Subscriptions imported</div>
-                        </div>
-                        <button onclick="rescanGmail()" style="padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">Re-scan</button>
-                        <button onclick="resetGmail()" style="padding:8px 14px;border:1.5px solid #fca5a5;border-radius:8px;background:#fef2f2;font-size:13px;font-weight:600;cursor:pointer;color:#ef4444">Disconnect</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-card">
-                <div class="section-head">
-                    <h3>🔔 Upcoming Renewals</h3>
-                    <span class="badge urgent" id="dashUpcomingBadge">0 this week</span>
-                </div>
-                <div id="dashUpcomingList">
-                    <div class="empty-state">
-                        <div class="empty-icon">🎉</div>
-                        <div class="empty-title">Nothing due soon</div>
-                        <div class="empty-sub">No renewals in the next 30 days.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Subscriptions -->
-        <div id="page-subscriptions" class="page">
-            <div class="page-header">
-                <h2>All Subscriptions</h2>
-                <p>Manage and track every service you're paying for.</p>
-            </div>
-
-            <div class="topbar">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search subscriptions..." id="searchInput" oninput="renderSubscriptions()" />
-                </div>
-                <div class="topbar-right">
-                    <button class="btn-export" onclick="exportCSV()">📥 Export CSV</button>
-                    <button class="btn-add" onclick="openModal()">+ Add New</button>
-                </div>
-            </div>
-
-            <div class="category-row" id="categoryChips"></div>
-
-            <div class="section-card">
-                <div id="subList"></div>
-            </div>
-        </div>
-
-        <!-- Analytics -->
-        <div id="page-analytics" class="page">
-            <div class="page-header">
-                <h2>Spending Analytics</h2>
-                <p>Understand where your money goes.</p>
-            </div>
-
-            <div class="stats-grid" style="margin-bottom:28px">
-                <div class="stat-card blue">
-                    <div class="stat-icon">📆</div>
-                    <p class="stat-label">Daily Average</p>
-                    <p class="stat-value">$<span id="anaDaily">0.00</span></p>
-                    <p class="stat-sub">per day</p>
-                </div>
-                <div class="stat-card orange">
-                    <div class="stat-icon">💰</div>
-                    <p class="stat-label">Most Expensive</p>
-                    <p class="stat-value" id="anaMostExpensive">—</p>
-                    <p class="stat-sub" id="anaMostExpensiveSub">no subs yet</p>
-                </div>
-                <div class="stat-card green">
-                    <div class="stat-icon">✅</div>
-                    <p class="stat-label">Avg. Per Subscription</p>
-                    <p class="stat-value">$<span id="anaAvg">0.00</span></p>
-                    <p class="stat-sub">monthly average</p>
-                </div>
-                <div class="stat-card red">
-                    <div class="stat-icon">🏷️</div>
-                    <p class="stat-label">Top Category</p>
-                    <p class="stat-value" id="anaTopCat" style="font-size:20px">—</p>
-                    <p class="stat-sub" id="anaTopCatSub">by spend</p>
-                </div>
-            </div>
-
-            <div class="section-card">
-                <div class="section-head"><h3>Spending by Category</h3></div>
-                <div id="catBreakdown" class="cat-breakdown">
-                    <div class="empty-state">
-                        <div class="empty-icon">📊</div>
-                        <div class="empty-title">No data yet</div>
-                        <div class="empty-sub">Add subscriptions to see your breakdown.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Upcoming Renewals -->
-        <div id="page-upcoming" class="page">
-            <div class="page-header">
-                <h2>Upcoming Renewals</h2>
-                <p>Stay on top of every payment before it hits.</p>
-            </div>
-
-            <div class="section-card">
-                <div class="section-head">
-                    <h3>Next 30 Days</h3>
-                    <span class="badge" id="upcomingCountBadge">0 renewals</span>
-                </div>
-                <div id="upcomingPageList">
-                    <div class="empty-state">
-                        <div class="empty-icon">✅</div>
-                        <div class="empty-title">All clear!</div>
-                        <div class="empty-sub">No renewals in the next 30 days.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-</div>
-
-<!-- Mobile bottom navigation -->
-<nav class="mobile-nav">
-    <button class="mobile-nav-item active" onclick="showPage('dashboard')">
-        <span class="nav-emoji">🏠</span><span>Dashboard</span>
-    </button>
-    <button class="mobile-nav-item" onclick="showPage('subscriptions')">
-        <span class="nav-emoji">📋</span><span>Subs</span>
-    </button>
-    <button class="mobile-nav-item" onclick="showPage('analytics')">
-        <span class="nav-emoji">📈</span><span>Analytics</span>
-    </button>
-    <button class="mobile-nav-item" onclick="showPage('upcoming')">
-        <span class="nav-emoji">🔔</span><span>Upcoming</span>
-    </button>
+        <a href="app.html" class="land-nav-cta">Open App →</a>
+    </div>
 </nav>
 
-<!-- Toast container -->
-<div id="toastContainer"></div>
+<!-- ─── HERO ─── -->
+<section class="land-hero">
+    <!-- Organic blob shapes -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
 
-<!-- Add / Edit Modal -->
-<div id="modalBackdrop" class="modal-backdrop hidden" onclick="closeModalBackdrop(event)">
-    <div class="modal">
-        <div class="modal-head">
-            <h3 id="modalTitle">Add Subscription</h3>
-            <button class="close-btn" onclick="closeModal()">✕</button>
-        </div>
+    <!-- Leaf decorations -->
+    <span class="leaf-dec leaf-1">🍃</span>
+    <span class="leaf-dec leaf-2">🌿</span>
+    <span class="leaf-dec leaf-3">🍀</span>
+    <span class="leaf-dec leaf-4">🌱</span>
+    <span class="leaf-dec leaf-5">🍃</span>
 
-        <div class="field">
-            <label>Subscription Name</label>
-            <input type="text" id="fName" placeholder="e.g. Netflix, Spotify, Adobe..." />
-            <p class="field-error hidden" id="errName"></p>
-        </div>
-
-        <div class="field">
-            <label>Choose an Icon</label>
-            <div class="emoji-picker" id="emojiPicker"></div>
-        </div>
-
-        <div class="grid-2">
-            <div class="field">
-                <label>Cost</label>
-                <input type="number" id="fCost" placeholder="0.00" step="0.01" min="0" />
-                <p class="field-error hidden" id="errCost"></p>
+    <div class="hero-inner">
+        <div class="hero-text">
+            <div class="hero-badge">🌱 Mindful Finance Platform</div>
+            <h1>Track Every Subscription.<br><span class="hero-accent">Waste Nothing.</span></h1>
+            <p>The eco-conscious way to manage your recurring costs. See exactly what you spend, cut what you don't use, and reduce your digital footprint — all in one beautiful dashboard.</p>
+            <div class="hero-actions">
+                <a href="app.html" class="btn-hero-primary">🚀 Start Tracking Free</a>
+                <a href="#calculator" class="btn-hero-ghost">📊 See Your Footprint</a>
             </div>
-            <div class="field">
-                <label>Billing Cycle</label>
-                <select id="fCycle">
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                    <option value="weekly">Weekly</option>
-                </select>
+            <div class="hero-trust">
+                <span>✓ No signup required</span>
+                <span>✓ 100% free forever</span>
+                <span>✓ Your data stays private</span>
+                <span>✓ Gmail auto-detect</span>
             </div>
         </div>
 
-        <div class="grid-2">
-            <div class="field">
-                <label>Next Renewal Date</label>
-                <input type="date" id="fDate" />
-                <p class="field-error hidden" id="errDate"></p>
+        <div class="hero-preview">
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span class="preview-dot red"></span>
+                    <span class="preview-dot amber"></span>
+                    <span class="preview-dot green"></span>
+                    <span>SubTrack Dashboard</span>
+                </div>
+                <div class="preview-stats">
+                    <div class="preview-stat">
+                        <div class="preview-stat-val">$147<span>/mo</span></div>
+                        <div class="preview-stat-label">Total Spend</div>
+                    </div>
+                    <div class="preview-stat highlight">
+                        <div class="preview-stat-val">$38<span>/mo</span></div>
+                        <div class="preview-stat-label">Est. Waste</div>
+                    </div>
+                    <div class="preview-stat">
+                        <div class="preview-stat-val">12</div>
+                        <div class="preview-stat-label">Active Subs</div>
+                    </div>
+                </div>
+                <div class="preview-list">
+                    <div class="preview-item">
+                        <span>📺</span>
+                        <span class="preview-item-name">Netflix</span>
+                        <span class="preview-pill urgent">3d</span>
+                        <span class="preview-item-cost">$15.49</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>🎵</span>
+                        <span class="preview-item-name">Spotify</span>
+                        <span class="preview-pill soon">8d</span>
+                        <span class="preview-item-cost">$9.99</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>🤖</span>
+                        <span class="preview-item-name">Claude Pro</span>
+                        <span class="preview-pill ok">21d</span>
+                        <span class="preview-item-cost">$20.00</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>☁️</span>
+                        <span class="preview-item-name">Google One</span>
+                        <span class="preview-pill ok">25d</span>
+                        <span class="preview-item-cost">$2.99</span>
+                    </div>
+                </div>
             </div>
-            <div class="field">
-                <label>Category</label>
-                <select id="fCategory">
-                    <option value="Entertainment">🎬 Entertainment</option>
-                    <option value="Music">🎵 Music</option>
-                    <option value="Software">💻 Software</option>
-                    <option value="Gaming">🎮 Gaming</option>
-                    <option value="News & Reading">📰 News &amp; Reading</option>
-                    <option value="Health & Fitness">🏃 Health &amp; Fitness</option>
-                    <option value="Cloud Storage">☁️ Cloud Storage</option>
-                    <option value="Finance">💰 Finance</option>
-                    <option value="Shopping">🛍️ Shopping</option>
-                    <option value="Other">📦 Other</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="field">
-            <label>Notes (optional)</label>
-            <input type="text" id="fNotes" placeholder="e.g. Family plan, work expense..." />
-        </div>
-
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-            <button class="btn-save" onclick="saveSub()">Save Subscription</button>
         </div>
     </div>
+</section>
+
+<!-- ─── WAVE DIVIDER ─── -->
+<div class="wave-top">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,40 C180,80 360,0 540,40 C720,80 900,0 1080,40 C1260,80 1440,20 1440,40 L1440,80 L0,80 Z"
+              fill="#f0fdf4"/>
+    </svg>
 </div>
 
-<!-- Detected Subscriptions Modal -->
-<div id="detectedBackdrop" class="modal-backdrop hidden" onclick="closeDetectedBackdrop(event)">
-    <div class="modal" style="max-width:560px;max-height:80vh;display:flex;flex-direction:column">
-        <div class="modal-head">
-            <h3 id="detectedTitle">Found subscriptions</h3>
-            <button class="close-btn" onclick="closeDetectedModal()">✕</button>
+<!-- ─── METRICS STRIP ─── -->
+<section class="land-metrics" id="metrics">
+    <div class="metrics-inner">
+        <div class="metric-card">
+            <span class="metric-icon">💸</span>
+            <div class="metric-val">
+                <span class="metric-val-prefix">$</span><span class="js-counter" data-target="240">0</span>
+            </div>
+            <div class="metric-label">Avg. annual savings found</div>
         </div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-            Review what we found. Uncheck anything you don't want to import. Costs are pre-filled — adjust if needed.
-        </p>
-        <div id="detectedList" style="flex:1;overflow-y:auto;border:1px solid var(--border);border-radius:10px;margin-bottom:16px"></div>
-        <div style="display:flex;gap:10px">
-            <button class="btn-cancel" onclick="closeDetectedModal()">Cancel</button>
-            <button class="btn-save" onclick="importDetected()">Import Selected</button>
+        <div class="metric-card">
+            <span class="metric-icon">📋</span>
+            <div class="metric-val">
+                <span class="js-counter" data-target="14">0</span>
+            </div>
+            <div class="metric-label">Avg. subscriptions per person</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-icon">🌱</span>
+            <div class="metric-val">
+                <span class="js-counter" data-target="32">0</span>
+                <span class="metric-val-suffix">%</span>
+            </div>
+            <div class="metric-label">Users cut unused subs in month 1</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-icon">⚡</span>
+            <div class="metric-val">
+                <span class="js-counter" data-target="30">0</span>
+                <span class="metric-val-suffix">s</span>
+            </div>
+            <div class="metric-label">Setup time — no account needed</div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Scripts — loaded in dependency order -->
-<script src="js/constants.js"></script>
-<script src="js/state.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/toast.js"></script>
-<script src="js/helpers.js"></script>
-<script src="js/navigation.js"></script>
-<script src="js/render.js"></script>
-<script src="js/modal.js"></script>
-<script src="js/subscriptions.js"></script>
-<script src="js/gmail.js"></script>
-<script src="js/main.js"></script>
+<!-- ─── CALCULATOR ─── -->
+<section class="land-calculator" id="calculator">
+    <div class="calc-inner">
+        <div class="calc-text">
+            <div class="section-badge">🔢 Footprint Calculator</div>
+            <h2>What's Your Subscription Footprint?</h2>
+            <p>Most people underestimate their recurring spend by 40%. Drag the sliders to see your true annual cost — and how much you could save.</p>
+            <div class="calc-features">
+                <div class="calc-feature">
+                    <div class="calc-feature-icon">📅</div>
+                    See your true annual spend at a glance
+                </div>
+                <div class="calc-feature">
+                    <div class="calc-feature-icon">🔍</div>
+                    Estimate how much might be wasted
+                </div>
+                <div class="calc-feature">
+                    <div class="calc-feature-icon">✂️</div>
+                    Know exactly what to cut first
+                </div>
+                <div class="calc-feature">
+                    <div class="calc-feature-icon">📈</div>
+                    Track real savings over time in the app
+                </div>
+            </div>
+        </div>
 
+        <div class="calc-card">
+            <div class="calc-card-title">🌿 Subscription Footprint Calculator</div>
+
+            <div class="calc-field">
+                <label>
+                    Number of subscriptions
+                    <span id="calcCountVal">8</span>
+                </label>
+                <input type="range" class="calc-slider" id="calcCount"
+                       min="1" max="30" value="8"
+                       oninput="calcUpdate()">
+            </div>
+
+            <div class="calc-field">
+                <label>
+                    Average monthly cost per sub
+                    <span>$<span id="calcCostVal">12</span></span>
+                </label>
+                <input type="range" class="calc-slider" id="calcCost"
+                       min="1" max="60" value="12"
+                       oninput="calcUpdate()">
+            </div>
+
+            <div class="calc-field">
+                <label>
+                    Subs you barely use
+                    <span id="calcWasteVal">3</span>
+                </label>
+                <input type="range" class="calc-slider" id="calcWaste"
+                       min="0" max="15" value="3"
+                       oninput="calcUpdate()">
+            </div>
+
+            <div class="calc-divider"></div>
+
+            <div class="calc-result">
+                <div class="calc-result-title">Your Subscription Footprint</div>
+                <div class="calc-result-row">
+                    <span class="label">Monthly total</span>
+                    <span class="value" id="calcMonthly">$96.00</span>
+                </div>
+                <div class="calc-result-row highlight">
+                    <span class="label">Annual spend</span>
+                    <span class="value" id="calcAnnual">$1,152</span>
+                </div>
+                <div class="calc-result-row">
+                    <span class="label">Estimated waste / yr</span>
+                    <span class="value" id="calcWastedAmt" style="color:#f87171">$432</span>
+                </div>
+                <div class="calc-result-row">
+                    <span class="label">Potential savings / yr</span>
+                    <span class="value" id="calcSavings" style="color:#4ade80">$432</span>
+                </div>
+            </div>
+
+            <a href="app.html" class="calc-cta">🚀 Start Tracking to Save This →</a>
+        </div>
+    </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section class="land-features" id="features">
+    <div class="section-header">
+        <div class="section-badge">✨ Features</div>
+        <h2>Everything You Need, Nothing You Don't</h2>
+        <p>Built with intention — lean, fast, and respectful of your time and data.</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Visual Dashboard</h3>
+            <p>See all your subscriptions in one clean view. Upcoming renewals, monthly totals, and category breakdowns — all at a glance with beautiful earth-tone charts.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📧</div>
+            <h3>Gmail Auto-Detect</h3>
+            <p>Connect Gmail to automatically scan for subscription emails and import them instantly. No manual data entry — it finds Netflix, Spotify, Adobe and 50+ more.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <h3>Renewal Alerts</h3>
+            <p>Never get surprised by a charge again. Urgent badges highlight renewals within 3 days, and upcoming reminders keep you in control of your budget.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🗂️</div>
+            <h3>Smart Categories</h3>
+            <p>Subscriptions auto-sort into Entertainment, Software, Health, Gaming, and more. Filter by category to spot where your money really goes.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💾</div>
+            <h3>Private by Default</h3>
+            <p>All data lives in your browser's localStorage — nothing leaves your device unless you connect Gmail. No account, no tracking, no servers storing your data.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Works Everywhere</h3>
+            <p>Fully responsive design with a mobile bottom navigation bar. Manage subscriptions from your phone, tablet, or desktop — same experience everywhere.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ─── TRUST / CERTIFICATION BADGES ─── -->
+<section class="land-trust" id="trust">
+    <div class="trust-inner">
+        <div class="section-header">
+            <div class="section-badge">🏅 Certified</div>
+            <h2>Built on Trust</h2>
+            <p>SubTrack is designed around principles we believe every personal finance tool should follow.</p>
+        </div>
+
+        <div class="trust-grid">
+            <div class="trust-badge">
+                <span class="trust-badge-icon">🔒</span>
+                <h4>Privacy First</h4>
+                <p>Zero server-side data storage. Your subscription list never leaves your browser unless you say so.</p>
+                <span class="cert-ribbon">✓ No Data Collection</span>
+            </div>
+            <div class="trust-badge">
+                <span class="trust-badge-icon">🌍</span>
+                <h4>Open Source</h4>
+                <p>Fully transparent codebase on GitHub. Read every line. Fork it. Improve it. No black boxes.</p>
+                <span class="cert-ribbon">✓ View on GitHub</span>
+            </div>
+            <div class="trust-badge">
+                <span class="trust-badge-icon">♾️</span>
+                <h4>Free Forever</h4>
+                <p>No freemium traps, no subscription to track your subscriptions. Full features at zero cost, always.</p>
+                <span class="cert-ribbon">✓ Always Free</span>
+            </div>
+            <div class="trust-badge">
+                <span class="trust-badge-icon">✉️</span>
+                <h4>Gmail Ready</h4>
+                <p>Official Google OAuth2 integration. Scans your inbox read-only to find billing emails automatically.</p>
+                <span class="cert-ribbon">✓ OAuth2 Secured</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── FINAL CTA ─── -->
+<section class="land-cta-final">
+    <span class="leaf-dec" style="top:10%;left:5%;font-size:64px">🍃</span>
+    <span class="leaf-dec" style="bottom:15%;right:5%;font-size:48px">🌿</span>
+    <span class="leaf-dec" style="top:60%;left:45%;font-size:36px">🌱</span>
+
+    <div class="cta-final-inner">
+        <div class="section-badge">🌿 Join the Movement</div>
+        <h2>Stop Paying for Things You Forgot About</h2>
+        <p>Take 30 seconds. No signup, no credit card. Just a cleaner, greener picture of where your money goes each month.</p>
+        <div class="cta-final-actions">
+            <a href="app.html" class="btn-hero-primary">🚀 Open the App Free</a>
+            <a href="https://github.com/nyang9825-crypto/SubTrack" target="_blank" class="btn-hero-ghost">⭐ Star on GitHub</a>
+        </div>
+    </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="land-footer">
+    <div class="land-footer-inner">
+        <p>© 2025 SubTrack — Made with 🌿 for mindful spending</p>
+        <div class="footer-links">
+            <a href="app.html">Open App</a>
+            <a href="https://github.com/nyang9825-crypto/SubTrack" target="_blank">GitHub</a>
+        </div>
+    </div>
+</footer>
+
+<script src="js/landing.js"></script>
 </body>
 </html>

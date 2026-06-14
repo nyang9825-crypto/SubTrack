@@ -1,16 +1,16 @@
 const EMOJIS = ['📺','🎵','💻','🎮','📰','🏃','☁️','💰','🛍️','📦','🎬','📱','🔒','📧','🗂️','🎙️','🖥️','📡'];
 
 const CAT_COLORS = {
-    'Entertainment':    '#3b82f6',
-    'Music':            '#a855f7',
-    'Software':         '#0ea5e9',
-    'Gaming':           '#f97316',
-    'News & Reading':   '#84cc16',
-    'Health & Fitness': '#22c55e',
-    'Cloud Storage':    '#06b6d4',
-    'Finance':          '#f59e0b',
-    'Shopping':         '#ec4899',
-    'Other':            '#94a3b8',
+    'Entertainment':    '#16a34a',
+    'Music':            '#0d9488',
+    'Software':         '#0284c7',
+    'Gaming':           '#7c3aed',
+    'News & Reading':   '#65a30d',
+    'Health & Fitness': '#059669',
+    'Cloud Storage':    '#0891b2',
+    'Finance':          '#d97706',
+    'Shopping':         '#db2777',
+    'Other':            '#6b7280',
 };
 
 const KNOWN_SENDERS = {
