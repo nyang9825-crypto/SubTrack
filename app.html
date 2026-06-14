@@ -35,8 +35,11 @@
         </a>
 
         <p class="nav-label">Menu</p>
-        <button class="nav-item active" onclick="showPage('dashboard')">
-            <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Dashboard
+        <button class="nav-item active" onclick="showPage('home')">
+            <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Home
+        </button>
+        <button class="nav-item" onclick="showPage('dashboard')">
+            <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span> Dashboard
         </button>
         <button class="nav-item" onclick="showPage('subscriptions')">
             <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span> Subscriptions
@@ -65,8 +68,44 @@
     <!-- ── Main ── -->
     <main class="main">
 
+        <!-- ══ HOME — Quick Add ══ -->
+        <div id="page-home" class="page active">
+            <!-- Header -->
+            <div class="home-header">
+                <div>
+                    <h2 id="homeGreeting" class="home-greeting">Good morning 👋</h2>
+                    <p id="homeTodayDate" style="font-size:13px;color:var(--muted);margin-top:2px"></p>
+                </div>
+                <button class="home-avatar" id="homeAvatar" onclick="handleAvatarTap()" title="Account">S</button>
+            </div>
+
+            <!-- Budget strip -->
+            <div id="homeBudgetStrip"></div>
+
+            <!-- Monthly chart -->
+            <div id="homeChartArea"></div>
+
+            <!-- Quick Add grid -->
+            <div style="margin-bottom:28px">
+                <div class="home-section-row">
+                    <span class="home-section-title">Quick Add</span>
+                    <span style="font-size:12px;color:var(--muted)">Tap a category</span>
+                </div>
+                <div class="cat-quick-grid" id="catQuickGrid"></div>
+            </div>
+
+            <!-- Recent transactions -->
+            <div>
+                <div class="home-section-row" style="margin-bottom:12px">
+                    <span class="home-section-title">Recent</span>
+                    <button onclick="showPage('spending')" class="see-all-btn">See all →</button>
+                </div>
+                <div id="homeRecentList"></div>
+            </div>
+        </div>
+
         <!-- Dashboard -->
-        <div id="page-dashboard" class="page active">
+        <div id="page-dashboard" class="page">
             <div class="page-header">
                 <h2 id="greetingText">Good morning 👋</h2>
                 <p>Here's an overview of your subscriptions.</p>
@@ -306,20 +345,20 @@
 
 <!-- Mobile bottom navigation -->
 <nav class="mobile-nav">
-    <button class="mobile-nav-item active" onclick="showPage('dashboard')">
-        <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span>Dashboard</span>
-    </button>
-    <button class="mobile-nav-item" onclick="showPage('subscriptions')">
-        <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span><span>Subs</span>
-    </button>
-    <button class="mobile-nav-item" onclick="showPage('analytics')">
-        <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span><span>Analytics</span>
-    </button>
-    <button class="mobile-nav-item" onclick="showPage('upcoming')">
-        <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span>Upcoming</span>
+    <button class="mobile-nav-item active" onclick="showPage('home')">
+        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span>Home</span>
     </button>
     <button class="mobile-nav-item" onclick="showPage('spending')">
-        <span class="nav-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span>Budget</span>
+        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><span>History</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPage('subscriptions')">
+        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span><span>Subs</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPage('dashboard')">
+        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Overview</span>
+    </button>
+    <button class="mobile-nav-item" onclick="showPage('analytics')">
+        <span class="nav-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span><span>Analytics</span>
     </button>
 </nav>
 
@@ -526,6 +565,68 @@
     </div>
 </div>
 
+<!-- Quick Add Bottom Sheet -->
+<div id="quickAddBackdrop" class="modal-backdrop hidden" onclick="if(event.target===this)closeQuickAdd()">
+    <div class="modal quick-add-sheet">
+        <!-- Category header -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+            <div id="qaCatIcon" style="width:54px;height:54px;border-radius:16px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🍽️</div>
+            <div>
+                <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.3px" id="qaCatName">Food & Dining</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:1px">How much did you spend?</div>
+            </div>
+        </div>
+
+        <!-- Amount — BIG -->
+        <div style="position:relative;margin-bottom:14px">
+            <span style="position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:28px;font-weight:800;color:var(--muted);pointer-events:none">$</span>
+            <input type="number" id="qaAmount" inputmode="decimal" placeholder="0.00" step="0.01" min="0"
+                style="width:100%;padding:18px 18px 18px 52px;font-size:40px;font-weight:800;color:var(--text);border:2px solid var(--border);border-radius:16px;outline:none;font-family:inherit;letter-spacing:-1.5px"
+                onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
+                onkeydown="if(event.key==='Enter')submitQuickAdd()" />
+        </div>
+
+        <!-- Description + Date row -->
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px">
+            <input type="text" id="qaDesc" placeholder="What was it for? (optional)"
+                style="padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);min-width:0"
+                onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'"
+                onkeydown="if(event.key==='Enter')submitQuickAdd()" />
+            <input type="date" id="qaDate"
+                style="padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-family:inherit;outline:none;color:var(--text);width:148px"
+                onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+
+        <!-- Receipt photo -->
+        <div id="qaReceiptPreview" style="display:none;margin-bottom:14px;position:relative">
+            <img id="qaReceiptImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;display:block" />
+            <button onclick="removeQaReceipt()" title="Remove photo"
+                style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;color:white;font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+        </div>
+        <div id="qaReceiptBtns" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+            <label for="qaReceiptCamera" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;background:white;transition:all 0.15s"
+                onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Camera
+                <input type="file" id="qaReceiptCamera" accept="image/*" capture="environment" onchange="onQaReceiptChange(event)" style="display:none" />
+            </label>
+            <label for="qaReceiptGallery" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:13px;border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;background:white;transition:all 0.15s"
+                onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Gallery
+                <input type="file" id="qaReceiptGallery" accept="image/*" onchange="onQaReceiptChange(event)" style="display:none" />
+            </label>
+        </div>
+
+        <button onclick="submitQuickAdd()"
+            style="width:100%;padding:17px;background:linear-gradient(135deg,var(--primary),var(--teal));color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(22,163,74,0.4);letter-spacing:-0.2px;transition:opacity 0.15s">
+            Add Expense
+        </button>
+    </div>
+</div>
+
 <!-- Scripts — loaded in dependency order -->
 <script src="js/icons.js"></script>
 <script src="js/constants.js"></script>
@@ -537,7 +638,9 @@
 <script src="js/render.js"></script>
 <script src="js/modal.js"></script>
 <script src="js/subscriptions.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/spending.js"></script>
+<script src="js/home.js"></script>
 <script src="js/gmail.js"></script>
 <script src="js/csv.js"></script>
 <script src="js/main.js"></script>

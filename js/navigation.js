@@ -11,7 +11,8 @@ function showPage(id) {
         n.classList.toggle('active', attr.includes(`'${id}'`));
     });
 
-    if (id === 'spending') { renderBudgetWidget(); renderSpendingPage(); }
+    if (id === 'home')     { renderHomePage(); }
+    else if (id === 'spending') { renderBudgetWidget(); renderSpendingPage(); }
     else renderAll();
 }
 
