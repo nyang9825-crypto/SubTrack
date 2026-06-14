@@ -105,6 +105,9 @@ function openTripDetail(id) {
     activeTripId = id;
     tripTab = 'expenses';
     renderTripsPage();
+    // Pull latest from Firestore for shared trips
+    const trip = getActiveTrip();
+    if (trip?.shareCode) refreshSharedTrip(trip.shareCode);
 }
 
 function closeTripDetail() {
@@ -563,6 +566,7 @@ function saveTripExpense() {
     }
 
     saveTrips();
+    if (trip.shareCode) _pushTripToFirestore(trip);
     closeTripExpenseModal();
     renderTripDetail();
 }
@@ -574,18 +578,29 @@ function deleteTripExpense(id) {
     if (!exp) return;
     trip.expenses = trip.expenses.filter(e => e.id !== id);
     saveTrips();
+    if (trip.shareCode) _pushTripToFirestore(trip);
     renderTripTabContent();
     toastUndo(`Deleted "${exp.name}"`, () => {
         if (!trip.expenses) trip.expenses = [];
         trip.expenses.push(exp);
         saveTrips();
+        if (trip.shareCode) _pushTripToFirestore(trip);
         renderTripDetail();
     });
 }
 
 // ── Share / Invite ─────────────────────────────────────────────────────
 async function _pushTripToFirestore(trip) {
-    if (typeof dbSetSharedTrip !== 'function') return;
+    if (!trip?.shareCode) return;
+    // Only update expenses — members are managed separately by dbJoinTrip
+    if (typeof dbUpdateSharedExpenses === 'function') {
+        await dbUpdateSharedExpenses(trip.shareCode, trip.expenses || []);
+    }
+}
+
+async function _initSharedTripDoc(trip) {
+    // Full set — used only when first publishing via invite/share
+    if (typeof dbSetSharedTrip !== 'function' || !trip?.shareCode) return;
     try {
         await dbSetSharedTrip(trip.shareCode, {
             name: trip.name, emoji: trip.emoji,
@@ -598,11 +613,28 @@ async function _pushTripToFirestore(trip) {
     } catch(e) { console.error(e); }
 }
 
+async function refreshSharedTrip(shareCode) {
+    if (typeof dbGetSharedTrip !== 'function') return;
+    try {
+        const data = await dbGetSharedTrip(shareCode);
+        if (!data) return;
+        const idx = trips.findIndex(t => t.shareCode === shareCode);
+        if (idx === -1) return;
+        trips[idx] = {
+            ...trips[idx],
+            members:  data.members  || trips[idx].members,
+            expenses: data.expenses || trips[idx].expenses || [],
+        };
+        localStorage.setItem(getKey('trips'), JSON.stringify(trips));
+        if (activeTripId === trips[idx].id) renderTripDetail();
+    } catch(e) { console.error('[trips] refresh error:', e); }
+}
+
 // Invite link — opens app (or sign-up) and auto-joins the trip
 async function copyInviteLink(tripId) {
     const trip = trips.find(t => t.id === tripId);
     if (!trip) return;
-    await _pushTripToFirestore(trip);
+    await _initSharedTripDoc(trip);
     const base = window.location.href.replace(/[?#].*$/, '').replace(/app\.html$/, '');
     const url  = `${base}app.html?joinTrip=${trip.shareCode}`;
     if (navigator.share) {
@@ -620,7 +652,7 @@ async function copyInviteLink(tripId) {
 async function shareTripLink(tripId) {
     const trip = trips.find(t => t.id === tripId);
     if (!trip) return;
-    await _pushTripToFirestore(trip);
+    await _initSharedTripDoc(trip);
     const base = window.location.href.replace(/[?#].*$/, '').replace(/app\.html$/, '');
     const url  = `${base}trip.html?code=${trip.shareCode}`;
     if (navigator.share) {

@@ -70,6 +70,16 @@ async function dbSetSharedTrip(shareCode, tripData) {
     } catch (e) { console.error('[db] share trip error:', e); }
 }
 
+async function dbUpdateSharedExpenses(shareCode, expenses) {
+    if (!_db) return;
+    try {
+        await _db.collection('shared_trips').doc(shareCode).update({
+            expenses: expenses.map(({ receiptThumb, ...e }) => e),
+            updatedAt: new Date().toISOString(),
+        });
+    } catch (e) { console.error('[db] updateSharedExpenses error:', e); }
+}
+
 async function dbJoinTrip(shareCode, memberInfo) {
     if (!_db) return;
     try {
