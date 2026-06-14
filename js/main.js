@@ -1,9 +1,11 @@
 window.addEventListener('load', () => {
+    // Auth gate — redirects to sign-up.html if no user
     if (!requireAuth()) return;
 
     subs      = loadSubs();
     spendings = loadSpendings();
 
+    // Fill avatar + sidebar user info
     const user = getUser();
     if (user) {
         const initial = (user.name?.charAt(0) || 'S').toUpperCase();
@@ -15,9 +17,13 @@ window.addEventListener('load', () => {
         if (tierEl) tierEl.textContent = user.email;
     }
 
-    setGreeting();
-    initGmailUI();
-    renderAll();
-    renderBudgetWidget();
-    renderHomePage();
+    // Run each init step independently so one crash doesn't block the rest
+    safeRun(setGreeting);
+    safeRun(initGmailUI);
+    safeRun(renderAll);
+    safeRun(renderHomePage);
 });
+
+function safeRun(fn) {
+    try { fn(); } catch (e) { console.error('[Sprout]', fn.name, e); }
+}

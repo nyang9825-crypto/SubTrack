@@ -71,12 +71,13 @@
         <!-- ══ HOME — Quick Add ══ -->
         <div id="page-home" class="page active">
             <!-- Header -->
-            <div class="home-header">
-                <div>
+            <div class="home-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+                <div style="min-width:0;flex:1">
                     <h2 id="homeGreeting" class="home-greeting">Good morning 👋</h2>
                     <p id="homeTodayDate" style="font-size:13px;color:var(--muted);margin-top:2px"></p>
                 </div>
-                <button class="home-avatar" id="homeAvatar" onclick="handleAvatarTap()" title="Account">S</button>
+                <button class="home-avatar" id="homeAvatar" onclick="handleAvatarTap()" title="Account"
+                    style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#0d9488);color:white;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;border:none;flex-shrink:0;cursor:pointer;margin-left:12px">S</button>
             </div>
 
             <!-- Budget strip -->

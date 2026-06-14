@@ -15,12 +15,17 @@ function renderHomePage() {
     if (greetEl) greetEl.textContent = `${greeting}${firstName ? ', ' + firstName : ''} 👋`;
 
     const dateEl = document.getElementById('homeTodayDate');
-    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    if (dateEl) {
+        try {
+            dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        } catch(e) {
+            dateEl.textContent = now.toDateString();
+        }
+    }
 
-    renderHomeBudget();
-    renderHomeChart();
-    renderQuickGrid();
-    renderRecentSpends();
+    [renderHomeBudget, renderHomeChart, renderQuickGrid, renderRecentSpends].forEach(fn => {
+        try { fn(); } catch(e) { console.error('[Sprout]', fn.name, e); }
+    });
 }
 
 function _homeYM() {
