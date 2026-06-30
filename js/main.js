@@ -15,6 +15,53 @@ function _hideLoader() {
     if (el) el.style.display = 'none';
 }
 
+function applyTheme(theme) {
+    const next = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('sprout_theme', next);
+
+    const isDark = next === 'dark';
+    [
+        ['themeToggleIcon', isDark ? '☀' : '☾'],
+        ['profileThemeToggleIcon', isDark ? '☀' : '☾'],
+        ['themeToggleLabel', isDark ? 'Light mode' : 'Dark mode'],
+        ['profileThemeToggleLabel', isDark ? 'Light mode' : 'Dark mode'],
+    ].forEach(([id, text]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    });
+}
+
+function toggleTheme() {
+    const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+function initTheme() {
+    const stored = localStorage.getItem('sprout_theme');
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    applyTheme(stored || (prefersDark ? 'dark' : 'light'));
+}
+
+function initUxPolish() {
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        document.querySelectorAll('.modal-backdrop:not(.hidden)').forEach(backdrop => {
+            const closeBtn = backdrop.querySelector('.close-btn');
+            if (closeBtn) closeBtn.click();
+        });
+    });
+
+    document.addEventListener('pointerdown', e => {
+        const target = e.target.closest('button, .sub-grid-card, .catalog-tile, .cat-quick-btn');
+        if (!target) return;
+        target.classList.remove('is-pressing');
+        void target.offsetWidth;
+        target.classList.add('is-pressing');
+        setTimeout(() => target.classList.remove('is-pressing'), 220);
+    });
+}
+
 function _maybeShowA2hs() {
     const isIOS        = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isStandalone = window.navigator.standalone === true;
@@ -46,6 +93,7 @@ function dismissA2hs() {
 }
 
 function _bootApp(user) {
+    initTheme();
     _applyUserUI(user);
     subs      = loadSubs();
     spendings = loadSpendings();
@@ -54,6 +102,7 @@ function _bootApp(user) {
     safeRun(initGmailUI);
     safeRun(renderAll);
     safeRun(renderHomePage);
+    safeRun(initUxPolish);
     _maybeShowA2hs();
 
     // Swipe-down close for sheet modals

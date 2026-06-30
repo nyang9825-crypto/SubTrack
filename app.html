@@ -6,11 +6,20 @@
     <title>Sprout — Where Your Money Grows</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" href="sprout-logo.png">
-    <meta name="theme-color" content="#052e16">
+    <meta name="theme-color" content="#101827">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sprout">
     <link rel="manifest" href="manifest.json">
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('sprout_theme');
+                var dark = saved ? saved === 'dark' : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="css/styles.css?v=f61bf77">
     <!-- Firebase SDK (must load before app scripts) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -23,8 +32,8 @@
 <body>
 
 <!-- Loading screen shown until Firebase auth resolves -->
-<div id="appLoader" style="position:fixed;inset:0;background:#f0fdf4;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
-    <div style="width:52px;height:52px;background:linear-gradient(145deg,#22c55e,#15803d);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(22,163,74,0.4)">
+<div id="appLoader" style="position:fixed;inset:0;background:#f6f4ef;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
+    <div style="width:52px;height:52px;background:linear-gradient(145deg,#10b981,#065f46);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(4,120,87,0.4)">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
             <path d="M 2.5 12 C 6 1 18 1 22 9 L 20.5 10.5 C 17 3.5 7 3.5 4 13 Z"/>
             <path d="M 6.5 14 C 8.3 14.8 8.3 20.2 6.5 21 C 4.7 20.2 4.7 14.8 6.5 14 Z"/>
@@ -32,7 +41,7 @@
             <path d="M 17.5 9 C 20.7 10.2 20.7 19.8 17.5 21 C 14.3 19.8 14.3 10.2 17.5 9 Z"/>
         </svg>
     </div>
-    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#166534">Loading Sprout…</div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#334155">Loading Sprout…</div>
 </div>
 
 <div id="app">
@@ -73,6 +82,13 @@
         </button>
 
         <div class="sidebar-bottom">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle light or dark theme">
+                <span class="theme-toggle-icon" id="themeToggleIcon">☾</span>
+                <span class="theme-toggle-copy">
+                    <span class="theme-toggle-label" id="themeToggleLabel">Dark mode</span>
+                    <span class="theme-toggle-sub">Calmer night view</span>
+                </span>
+            </button>
             <div class="user-badge" onclick="openProfile()" style="cursor:pointer" title="Profile">
                 <div class="avatar" id="sidebarAvatar">S</div>
                 <div class="user-badge-info">
@@ -95,7 +111,7 @@
                     <p id="homeTodayDate" style="font-size:13px;color:var(--muted);margin-top:2px"></p>
                 </div>
                 <button class="home-avatar" id="homeAvatar" onclick="handleAvatarTap()" title="Account"
-                    style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#0d9488);color:white;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;border:none;flex-shrink:0;cursor:pointer;margin-left:12px">S</button>
+                    style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#047857,#0f766e);color:white;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;border:none;flex-shrink:0;cursor:pointer;margin-left:12px">S</button>
             </div>
 
             <!-- Budget strip -->
@@ -126,7 +142,7 @@
         <!-- Subscriptions (with Overview and Analytics tabs) -->
         <div id="page-subscriptions" class="page">
             <!-- Sub-tab bar -->
-            <div style="display:flex;background:#f0fdf4;border-radius:14px;padding:5px;gap:4px;margin-bottom:22px">
+            <div style="display:flex;background:#f6f4ef;border-radius:14px;padding:5px;gap:4px;margin-bottom:22px">
                 <button id="subTabSubs" onclick="setSubTab('subs')"
                     style="flex:1;padding:10px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;background:white;color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,0.1)">
                     My Subs
@@ -216,7 +232,7 @@
                             </div>
                         </div>
                         <div id="gmailStepDone" class="hidden" style="display:flex;align-items:center;gap:14px">
-                            <div style="width:36px;height:36px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✅</div>
+                            <div style="width:36px;height:36px;background:#f6f4ef;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✅</div>
                             <div style="flex:1">
                                 <div style="font-size:14px;font-weight:600;color:var(--text)" id="gmailDoneText">Gmail connected</div>
                                 <div style="font-size:12px;color:var(--muted)" id="gmailDoneSub">Subscriptions imported</div>
@@ -377,7 +393,7 @@
         </div>
         <div style="padding:0 24px 8px">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-                <button id="ctTripEmoji" style="width:56px;height:56px;border-radius:16px;border:2px solid var(--border);background:#f0fdf4;font-size:28px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">✈️</button>
+                <button id="ctTripEmoji" style="width:56px;height:56px;border-radius:16px;border:2px solid var(--border);background:#f6f4ef;font-size:28px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">✈️</button>
                 <div style="flex:1">
                     <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Trip Name</label>
                     <input type="text" id="ctTripName" placeholder="e.g. Thailand Trip, Birthday Dinner"
@@ -399,9 +415,9 @@
                         onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
                 </div>
             </div>
-            <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+            <div style="background:#f6f4ef;border-radius:10px;padding:12px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
                 <div style="font-size:18px">🔗</div>
-                <div style="font-size:12px;color:#15803d;font-weight:600;line-height:1.4">Save the trip, then share the invite link — friends join by signing up.</div>
+                <div style="font-size:12px;color:#065f46;font-weight:600;line-height:1.4">Save the trip, then share the invite link — friends join by signing up.</div>
             </div>
         </div>
         <div class="modal-actions" style="display:flex!important">
@@ -507,7 +523,7 @@
         <div style="padding:0 24px 28px;text-align:center">
             <div style="position:relative;display:inline-block;margin:10px 0 12px">
                 <div id="profileAvatarLg"
-                    style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#0d9488);color:white;font-size:34px;font-weight:800;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #f0fdf4;margin:0 auto">S</div>
+                    style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#047857,#0f766e);color:white;font-size:34px;font-weight:800;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #f6f4ef;margin:0 auto">S</div>
                 <button onclick="triggerPhotoUpload()" title="Upload photo"
                     style="position:absolute;bottom:2px;right:2px;width:30px;height:30px;border-radius:50%;background:var(--primary);border:2.5px solid white;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -516,12 +532,20 @@
             </div>
             <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:2px">
                 <input id="profileNameInput" type="text" maxlength="40" placeholder="Your name"
-                    style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.3px;border:none;border-bottom:2px solid #bbf7d0;outline:none;background:transparent;text-align:center;width:100%;max-width:220px;font-family:inherit;padding-bottom:2px"
-                    onfocus="this.style.borderBottomColor='#16a34a'" onblur="this.style.borderBottomColor='#bbf7d0';saveProfileName()"
+                    style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.3px;border:none;border-bottom:2px solid #d7d1c4;outline:none;background:transparent;text-align:center;width:100%;max-width:220px;font-family:inherit;padding-bottom:2px"
+                    onfocus="this.style.borderBottomColor='#047857'" onblur="this.style.borderBottomColor='#d7d1c4';saveProfileName()"
                     onkeydown="if(event.key==='Enter')this.blur()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </div>
             <div id="profileEmail" style="font-size:13px;color:var(--muted);margin-top:4px">—</div>
+
+            <button class="theme-toggle profile-theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle light or dark theme">
+                <span class="theme-toggle-icon" id="profileThemeToggleIcon">☾</span>
+                <span class="theme-toggle-copy">
+                    <span class="theme-toggle-label" id="profileThemeToggleLabel">Dark mode</span>
+                    <span class="theme-toggle-sub">Switch app appearance</span>
+                </span>
+            </button>
 
             <!-- Avatar emoji picker -->
             <div style="margin:18px 0 20px;text-align:left">
@@ -543,7 +567,7 @@
 <div id="a2hsBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;padding:0 12px 80px;pointer-events:none">
     <div style="background:white;border-radius:20px;padding:18px 18px 18px 18px;box-shadow:0 -2px 30px rgba(0,0,0,0.13),0 0 0 1px rgba(0,0,0,0.06);pointer-events:all">
         <div style="display:flex;align-items:flex-start;gap:14px">
-            <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#16a34a,#0d9488);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🌱</div>
+            <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#047857,#0f766e);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🌱</div>
             <div style="flex:1;min-width:0">
                 <div style="font-size:15px;font-weight:800;color:#111827;margin-bottom:5px">Add Sprout to Home Screen</div>
                 <div style="font-size:13px;color:#6b7280;line-height:1.55">
@@ -852,7 +876,7 @@
         </div>
 
         <button onclick="submitQuickAdd()"
-            style="width:100%;padding:17px;background:linear-gradient(135deg,var(--primary),var(--teal));color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(22,163,74,0.4);letter-spacing:-0.2px;transition:opacity 0.15s">
+            style="width:100%;padding:17px;background:linear-gradient(135deg,var(--primary),var(--teal));color:white;border:none;border-radius:14px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(4,120,87,0.4);letter-spacing:-0.2px;transition:opacity 0.15s">
             Add Expense
         </button>
     </div>

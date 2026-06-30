@@ -4,8 +4,8 @@
   "description": "Track subscriptions, spending, and shared trip expenses",
   "start_url": "./app.html",
   "display": "standalone",
-  "background_color": "#f0fdf4",
-  "theme_color": "#052e16",
+  "background_color": "#f6f4ef",
+  "theme_color": "#101827",
   "orientation": "portrait-primary",
   "icons": [
     { "src": "sprout-logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

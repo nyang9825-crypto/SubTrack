@@ -9,27 +9,26 @@
 ───────────────────────────────────────── */
 
 :root {
-    --forest:       #052e16;
-    --forest-mid:   #14532d;
-    --forest-light: #166534;
-    --green:        #16a34a;
-    --green-mid:    #22c55e;
-    --teal:         #0d9488;
+    --forest:       #101827;
+    --forest-mid:   #162235;
+    --forest-light: #24324a;
+    --green:        #047857;
+    --green-mid:    #10b981;
+    --teal:         #0f766e;
     --teal-light:   #ccfbf1;
-    --sage:         #4d7c60;
-    --mint:         #d1fae5;
-    --lime:         #ecfdf5;
-    --amber:        #f59e0b;
-    --amber-light:  #fef3c7;
-    --earth:        #78350f;
-    --stone:        #f5f5f4;
+    --sage:         #64748b;
+    --mint:         #e8e2d6;
+    --lime:         #f6f4ef;
+    --amber:        #c6922e;
+    --amber-light:  #fff4d6;
+    --earth:        #7c5d1d;
+    --stone:        #f6f4ef;
     --white:        #ffffff;
-    --text:         #052e16;
-    --text-2:       #166534;
-    --muted:        #6b7280;
-    --border:       #bbf7d0;
+    --text:         #111827;
+    --text-2:       #334155;
+    --muted:        #64748b;
+    --border:       #d7d1c4;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
@@ -49,7 +48,7 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    background: rgba(5,46,22,0.92);
+    background: rgba(16,24,39,0.92);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -83,7 +82,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    box-shadow: 0 4px 12px rgba(22,163,74,0.4);
+    box-shadow: 0 4px 12px rgba(4,120,87,0.4);
 }
 
 .land-logo span {
@@ -121,12 +120,12 @@ body {
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(22,163,74,0.35);
+    box-shadow: 0 4px 12px rgba(4,120,87,0.35);
     transition: opacity 0.15s, box-shadow 0.15s;
     margin-left: auto;
 }
 
-.land-nav-cta:hover { opacity: 0.9; box-shadow: 0 6px 18px rgba(22,163,74,0.45); }
+.land-nav-cta:hover { opacity: 0.9; box-shadow: 0 6px 18px rgba(4,120,87,0.45); }
 
 /* ════════════════════════════════════
    HERO
@@ -135,9 +134,9 @@ body {
     min-height: 100vh;
     background: var(--forest);
     background-image:
-        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(22,163,74,0.22) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(13,148,136,0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 60% 30%, rgba(34,197,94,0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(4,120,87,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(15,118,110,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 60% 30%, rgba(16,185,129,0.08) 0%, transparent 50%);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -220,8 +219,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(22,163,74,0.18);
-    border: 1px solid rgba(22,163,74,0.3);
+    background: rgba(4,120,87,0.18);
+    border: 1px solid rgba(4,120,87,0.3);
     color: #86efac;
     padding: 5px 14px;
     border-radius: 99px;
@@ -273,7 +272,7 @@ body {
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 6px 20px rgba(22,163,74,0.4);
+    box-shadow: 0 6px 20px rgba(4,120,87,0.4);
     transition: transform 0.2s, box-shadow 0.2s;
     display: inline-flex;
     align-items: center;
@@ -282,7 +281,7 @@ body {
 
 .btn-hero-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(22,163,74,0.5);
+    box-shadow: 0 10px 28px rgba(4,120,87,0.5);
 }
 
 .btn-hero-ghost {
@@ -351,7 +350,7 @@ body {
     gap: 6px;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #f0fdf4;
+    border-bottom: 1px solid #f6f4ef;
 }
 
 .preview-dot {
@@ -361,7 +360,7 @@ body {
 
 .preview-dot.red    { background: #ef4444; }
 .preview-dot.amber  { background: #f59e0b; }
-.preview-dot.green  { background: #22c55e; }
+.preview-dot.green  { background: #10b981; }
 
 .preview-header span {
     font-size: 12px;
@@ -378,11 +377,11 @@ body {
 }
 
 .preview-stat {
-    background: #f0fdf4;
+    background: #f6f4ef;
     border-radius: 10px;
     padding: 10px 8px;
     text-align: center;
-    border: 1px solid #d1fae5;
+    border: 1px solid #e8e2d6;
 }
 
 .preview-stat.highlight {
@@ -393,7 +392,7 @@ body {
 .preview-stat-val {
     font-size: 15px;
     font-weight: 800;
-    color: #052e16;
+    color: #101827;
     letter-spacing: -0.5px;
 }
 
@@ -421,20 +420,20 @@ body {
     padding: 8px 10px;
     background: #fafafa;
     border-radius: 9px;
-    border: 1px solid #f0fdf4;
+    border: 1px solid #f6f4ef;
 }
 
 .preview-item-name {
     flex: 1;
     font-size: 12.5px;
     font-weight: 600;
-    color: #052e16;
+    color: #101827;
 }
 
 .preview-item-cost {
     font-size: 12px;
     font-weight: 700;
-    color: #166534;
+    color: #334155;
 }
 
 .preview-pill {
@@ -446,7 +445,7 @@ body {
 
 .preview-pill.urgent { background: #fff7ed; color: #c2410c; }
 .preview-pill.soon   { background: #fef3c7; color: #b45309; }
-.preview-pill.ok     { background: #dcfce7; color: #15803d; }
+.preview-pill.ok     { background: #dcfce7; color: #065f46; }
 
 /* ════════════════════════════════════
    WAVE DIVIDER
@@ -484,13 +483,13 @@ body {
     background: white;
     border-radius: 16px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(22,163,74,0.06);
+    box-shadow: 0 2px 8px rgba(4,120,87,0.06);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .metric-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(22,163,74,0.12);
+    box-shadow: 0 8px 20px rgba(4,120,87,0.12);
 }
 
 .metric-icon {
@@ -638,7 +637,7 @@ body {
     border: 1.5px solid var(--border);
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 8px 32px rgba(22,163,74,0.1);
+    box-shadow: 0 8px 32px rgba(4,120,87,0.1);
 }
 
 .calc-card-title {
@@ -683,8 +682,8 @@ body {
         to right,
         var(--green) 0%,
         var(--green) var(--val, 40%),
-        #d1fae5 var(--val, 40%),
-        #d1fae5 100%
+        #e8e2d6 var(--val, 40%),
+        #e8e2d6 100%
     );
     outline: none;
     cursor: pointer;
@@ -696,7 +695,7 @@ body {
     width: 20px; height: 20px;
     border-radius: 50%;
     background: var(--green);
-    box-shadow: 0 2px 8px rgba(22,163,74,0.4);
+    box-shadow: 0 2px 8px rgba(4,120,87,0.4);
     border: 2px solid white;
     cursor: pointer;
     transition: transform 0.15s;
@@ -751,7 +750,7 @@ body {
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
-    box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+    box-shadow: 0 4px 12px rgba(4,120,87,0.3);
     transition: opacity 0.15s;
 }
 
@@ -817,13 +816,13 @@ body {
     border-radius: 18px;
     padding: 32px 28px;
     border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(22,163,74,0.05);
+    box-shadow: 0 2px 8px rgba(4,120,87,0.05);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .feature-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(22,163,74,0.12);
+    box-shadow: 0 10px 28px rgba(4,120,87,0.12);
 }
 
 svg.feature-icon-svg {
@@ -879,7 +878,7 @@ svg.feature-icon-svg {
 
 .trust-badge:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(22,163,74,0.12);
+    box-shadow: 0 8px 24px rgba(4,120,87,0.12);
 }
 
 .trust-badge-icon {
@@ -939,8 +938,8 @@ svg.feature-icon-svg {
 .land-cta-final {
     background: var(--forest);
     background-image:
-        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(22,163,74,0.2) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(13,148,136,0.15) 0%, transparent 60%);
+        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(4,120,87,0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(15,118,110,0.15) 0%, transparent 60%);
     padding: 96px 32px;
     text-align: center;
     position: relative;
@@ -959,8 +958,8 @@ svg.feature-icon-svg {
 }
 
 .cta-final-inner .section-badge {
-    background: rgba(22,163,74,0.15);
-    border-color: rgba(22,163,74,0.3);
+    background: rgba(4,120,87,0.15);
+    border-color: rgba(4,120,87,0.3);
     color: #86efac;
 }
 
